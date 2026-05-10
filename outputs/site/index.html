@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>판교의 빛은 식었다 — 성남 청년 양극화 2024</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="./data.js"></script>
+
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-soft: #11121a;
+    --card: #161824;
+    --card-hover: #1e2030;
+    --border: #252837;
+    --text: #f4f4f8;
+    --text-dim: #8a8c9d;
+    --accent-warm: #f97316;   /* 유출 */
+    --accent-cool: #38bdf8;   /* 유입 */
+    --accent-gold: #facc15;
+    --accent-pink: #ec4899;
+  }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Pretendard Variable', Pretendard, sans-serif; }
+  .grain {
+    background-image:
+      radial-gradient(at 20% 10%, rgba(249,115,22,0.10) 0%, transparent 40%),
+      radial-gradient(at 80% 90%, rgba(56,189,248,0.10) 0%, transparent 40%),
+      radial-gradient(at 50% 50%, rgba(250,204,21,0.04) 0%, transparent 60%);
+  }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; }
+  .card:hover { background: var(--card-hover); }
+  .num-tabular { font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums; }
+  .punchline {
+    background: linear-gradient(120deg, #f97316 0%, #facc15 50%, #38bdf8 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .leaflet-container { background: var(--bg-soft); border-radius: 14px; }
+  .leaflet-tooltip { background: var(--card); color: var(--text); border: 1px solid var(--border); font-size: 12px; }
+  .leaflet-tooltip-top:before { border-top-color: var(--border); }
+  .scroll-fade { mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent); }
+  .stat-glow { text-shadow: 0 0 30px currentColor; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-soft); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .chip { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; border: 1px solid var(--border); }
+  .chip-out { background: rgba(249,115,22,0.15); color: #fdba74; border-color: rgba(249,115,22,0.3); }
+  .chip-in  { background: rgba(56,189,248,0.15); color: #7dd3fc; border-color: rgba(56,189,248,0.3); }
+  .ring-spotlight { box-shadow: 0 0 0 3px var(--accent-gold), 0 0 24px rgba(250,204,21,0.5); }
+  .narrative-quote { border-left: 3px solid var(--accent-gold); padding-left: 16px; }
+  .section-num {
+    display: inline-block; font-size: 11px; letter-spacing: 0.3em;
+    color: var(--text-dim); padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  details>summary { cursor: pointer; list-style: none; }
+  details>summary::-webkit-details-marker { display: none; }
+</style>
+</head>
+
+<body class="grain min-h-screen">
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="max-w-7xl mx-auto px-6 pt-24 pb-12">
+  <div class="text-xs tracking-[0.5em] text-amber-400 mb-4">SEONGNAM · YOUTH · 2024</div>
+  <h1 class="text-5xl md:text-7xl font-black leading-[1.05] mb-6">
+    판교의 빛은 <span class="punchline">이미 식었다</span>
+  </h1>
+  <p class="text-xl md:text-2xl text-zinc-400 max-w-3xl leading-relaxed">
+    성남시 청년 양극화의 진짜 축은 <strong class="text-white">"분당 vs 수정"</strong>이 아닙니다.<br>
+    <strong class="text-amber-400">노후 단지를 떠나 신축으로 모이는 49개 동의 미세한 흐름</strong> —
+    행정안전부 인구이동 데이터로 읽다.
+  </p>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 num-tabular">
+    <div class="card p-5">
+      <div class="text-xs text-zinc-500 mb-1">2024 청년 전입</div>
+      <div class="text-3xl font-bold text-sky-400" id="m-in">—</div>
+    </div>
+    <div class="card p-5">
+      <div class="text-xs text-zinc-500 mb-1">2024 청년 전출</div>
+      <div class="text-3xl font-bold text-orange-400" id="m-out">—</div>
+    </div>
+    <div class="card p-5">
+      <div class="text-xs text-zinc-500 mb-1">최강 유입동</div>
+      <div class="text-3xl font-bold text-sky-400 stat-glow" id="m-top-in">—</div>
+      <div class="text-xs text-zinc-500 mt-1" id="m-top-in-name"></div>
+    </div>
+    <div class="card p-5">
+      <div class="text-xs text-zinc-500 mb-1">최강 유출동</div>
+      <div class="text-3xl font-bold text-orange-400 stat-glow" id="m-top-out">—</div>
+      <div class="text-xs text-zinc-500 mt-1" id="m-top-out-name"></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ ① 지도 ═══════════════════ -->
+<section class="max-w-7xl mx-auto px-6 py-16">
+  <div class="section-num mb-2">CHAPTER 01</div>
+  <h2 class="text-3xl md:text-4xl font-bold mb-2">어디서 빠지고, 어디로 모이나</h2>
+  <p class="text-zinc-400 mb-8">동별 청년(20-34) 순유출률. 빨강 = 유출, 파랑 = 유입.</p>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <div class="card p-4 lg:col-span-2">
+      <div id="map" class="w-full" style="height: 580px;"></div>
+      <div class="flex items-center justify-between mt-3 text-xs text-zinc-500">
+        <span>호버 시 동별 수치 표시 · 클릭 시 사이드 패널 잠금</span>
+        <div class="flex items-center gap-4">
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:#1e3a8a"></span>유입</span>
+          <span class="w-px h-4 bg-zinc-700"></span>
+          <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:#7f1d1d"></span>유출</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-6 flex flex-col">
+      <div id="dong-name" class="text-2xl font-bold mb-1">동을 호버하세요</div>
+      <div id="dong-sgg" class="text-sm text-zinc-500 mb-6">—</div>
+
+      <div class="space-y-4 num-tabular">
+        <div>
+          <div class="text-xs text-zinc-500 mb-1">청년 순유출률</div>
+          <div id="dong-rate" class="text-4xl font-bold">—</div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-sm">
+          <div>
+            <div class="text-[10px] text-zinc-500 mb-1">청년 전입</div>
+            <div id="dong-in" class="text-sky-400 font-semibold">—</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-zinc-500 mb-1">청년 전출</div>
+            <div id="dong-out" class="text-orange-400 font-semibold">—</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-zinc-500 mb-1">청년 인구</div>
+            <div id="dong-pop" class="text-zinc-300 font-semibold">—</div>
+          </div>
+        </div>
+        <hr class="border-zinc-800">
+        <div>
+          <div class="text-xs text-zinc-500 mb-2">주요 도착지 (TOP5)</div>
+          <ul id="dong-top-dest" class="space-y-1 text-xs"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ ② 양극화 카드 ═══════════════════ -->
+<section class="max-w-7xl mx-auto px-6 py-16">
+  <div class="section-num mb-2">CHAPTER 02</div>
+  <h2 class="text-3xl md:text-4xl font-bold mb-2">분수령 — 신축 vs 노후</h2>
+  <p class="text-zinc-400 mb-8">상위 10개 동을 양 끝에서 비교합니다.</p>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="card p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="chip chip-out">유출 TOP 10</span>
+        <span class="text-zinc-500 text-xs">청년이 빠져나가는 동</span>
+      </div>
+      <div id="top-out-list" class="space-y-2"></div>
+    </div>
+    <div class="card p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="chip chip-in">유입 TOP 10</span>
+        <span class="text-zinc-500 text-xs">청년이 모이는 동</span>
+      </div>
+      <div id="top-in-list" class="space-y-2"></div>
+    </div>
+  </div>
+
+  <div class="card narrative-quote mt-8 p-6 text-zinc-300 leading-relaxed">
+    <strong class="text-amber-400">패턴이 보이나요?</strong>  유입 TOP은
+    <strong>신흥2동(재개발), 위례동(신도시), 운중·삼평(판교)</strong> 같은 <strong>신축</strong>
+    단지에 몰려 있고, 유출 TOP은 <strong>수내·정자·이매(분당 1세대 1990년대 아파트)</strong>와
+    <strong>상대원·수진·태평(원도심 노후 다세대)</strong>입니다. 분당구도 안전지대가 아닙니다.
+  </div>
+</section>
+
+
+<!-- ═══════════════════ ③ Sankey ═══════════════════ -->
+<section class="max-w-7xl mx-auto px-6 py-16">
+  <div class="section-num mb-2">CHAPTER 03</div>
+  <h2 class="text-3xl md:text-4xl font-bold mb-2">어디로 흘러갔나</h2>
+  <p class="text-zinc-400 mb-8">성남 49동 → 외부 시군구. 선 굵기 = 청년 이동 인원.</p>
+  <div class="card p-2">
+    <div id="sankey" style="height: 850px;"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ ④ 시계열 ═══════════════════ -->
+<section class="max-w-7xl mx-auto px-6 py-16">
+  <div class="section-num mb-2">CHAPTER 04</div>
+  <h2 class="text-3xl md:text-4xl font-bold mb-2">월별 추이 — 신흥2동의 폭발</h2>
+  <p class="text-zinc-400 mb-8">2024년 12개월 청년 순이동(전입-전출). 0선이 평형.</p>
+  <div class="grid lg:grid-cols-2 gap-6">
+    <div class="card p-4">
+      <div class="text-sm text-zinc-400 mb-2 px-2">시군구 단위 (3구)</div>
+      <div id="ts-sgg" style="height: 380px;"></div>
+    </div>
+    <div class="card p-4">
+      <div class="text-sm text-zinc-400 mb-2 px-2">핫스팟 동 (유입 TOP5 + 유출 TOP5)</div>
+      <div id="ts-dong" style="height: 380px;"></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ ⑤ 결론 ═══════════════════ -->
+<section class="max-w-7xl mx-auto px-6 py-24">
+  <div class="card p-10 md:p-16 bg-gradient-to-br from-zinc-900 to-zinc-950 border-zinc-700">
+    <div class="section-num mb-4">FINDINGS</div>
+    <h2 class="text-4xl md:text-5xl font-bold mb-8 leading-tight">
+      성남 청년의 진짜 이야기는<br>
+      <span class="punchline">"신축 단지를 향한 동 단위 이동"</span>입니다.
+    </h2>
+    <div class="grid md:grid-cols-3 gap-6 text-zinc-300">
+      <div>
+        <div class="text-amber-400 text-3xl font-bold mb-2">①</div>
+        <p>시군구 단위로는 분당 -430, 수정 +1,108로 평형에 가깝다. <strong class="text-white">통념과 달리 수정구로 청년이 모인다</strong>.</p>
+      </div>
+      <div>
+        <div class="text-amber-400 text-3xl font-bold mb-2">②</div>
+        <p>동 단위로 보면 <strong class="text-white">신흥2동 -14.7%, 위례동 -6.4%</strong> 같은 신축/재개발 단지로 청년이 폭발적으로 모인다.</p>
+      </div>
+      <div>
+        <div class="text-amber-400 text-3xl font-bold mb-2">③</div>
+        <p>분당 1세대 아파트(수내·정자·이매)와 원도심 노후 다세대에서는 <strong class="text-white">청년이 이미 빠져나가고 있다</strong>.</p>
+      </div>
+    </div>
+
+    <div class="mt-12 pt-8 border-t border-zinc-800 text-xs text-zinc-500 space-y-1">
+      <div>데이터: 행정안전부 「지역별 인구이동 현황」 (data.go.kr 15108093, 2024.01–2024.12)</div>
+      <div>모집단: 행정안전부 「지역별(행정동) 성별 연령별 주민등록 인구수」 (data.go.kr 15097972, 2026.03)</div>
+      <div>경계: <a href="https://github.com/raqoon886/Local_HangJeongDong" class="text-amber-500 hover:underline">raqoon886/Local_HangJeongDong</a></div>
+      <div>청년 정의: 만 20–34세 · 성남시 49개 행정동 (위례동 포함 50개)</div>
+      <div class="pt-2">2026 성남시 공공데이터 활용 시각화 경진대회 · 마감 2026-05-13</div>
+    </div>
+  </div>
+</section>
+
+
+<script>
+const D = window.SN_DATA;
+const fmt = n => (n==null?'—':n.toLocaleString('ko-KR'));
+const fmtPct = n => (n==null?'—':(n>0?'+':'') + n.toFixed(2) + '%');
+
+// ── 메트릭
+document.getElementById('m-in').textContent  = '+' + fmt(D.summary.total_in);
+document.getElementById('m-out').textContent = '–' + fmt(D.summary.total_out);
+
+const byRate = [...D.dong].sort((a,b)=>a.청년_순유출률 - b.청년_순유출률);
+const topIn = byRate[0], topOut = byRate[byRate.length-1];
+document.getElementById('m-top-in').textContent = fmtPct(topIn.청년_순유출률);
+document.getElementById('m-top-in-name').textContent = topIn.dong;
+document.getElementById('m-top-out').textContent = fmtPct(topOut.청년_순유출률);
+document.getElementById('m-top-out-name').textContent = topOut.dong;
+
+// ── TOP 10 lists
+function renderTop(list, target, isOut) {
+  const max = Math.max(...list.map(d => Math.abs(d.청년_순유출률)));
+  target.innerHTML = list.map((d, i) => {
+    const w = (Math.abs(d.청년_순유출률) / max * 100).toFixed(1);
+    const cls = isOut ? 'bg-orange-500' : 'bg-sky-500';
+    const sign = isOut ? '+' : '';
+    return `
+    <div class="hover:bg-zinc-800/50 rounded-lg p-3 transition cursor-pointer" data-dong="${d.dong}">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-sm">
+          <span class="text-zinc-500 mr-2">${String(i+1).padStart(2,'0')}</span>
+          <span class="font-semibold">${d.dong}</span>
+          <span class="text-xs text-zinc-500 ml-2">${(d.청년_인구||0).toLocaleString()}명</span>
+        </span>
+        <span class="text-sm num-tabular ${isOut?'text-orange-400':'text-sky-400'} font-semibold">
+          ${sign}${d.청년_순유출률.toFixed(2)}%
+        </span>
+      </div>
+      <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+        <div class="${cls} h-full rounded-full" style="width:${w}%"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+renderTop(byRate.slice(-10).reverse(), document.getElementById('top-out-list'), true);
+renderTop(byRate.slice(0, 10), document.getElementById('top-in-list'), false);
+
+
+// ── Leaflet
+const map = L.map('map', { zoomControl: true, attributionControl: false }).setView([37.42, 127.13], 12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd', maxZoom: 19,
+}).addTo(map);
+
+const rates = D.geo.features.map(f => f.properties.rate).filter(v => v!=null);
+const vmax = Math.max(...rates.map(Math.abs));
+function colorFor(v) {
+  if (v == null) return '#444';
+  const t = Math.max(-1, Math.min(1, v / vmax));
+  // -1: cool blue → 0: black → +1: warm red
+  if (t > 0) {
+    const a = t;
+    return `rgb(${Math.round(127*a + 22*(1-a))}, ${Math.round(29*a + 24*(1-a))}, ${Math.round(29*a + 36*(1-a))})`;
+  } else {
+    const a = -t;
+    return `rgb(${Math.round(30*a + 22*(1-a))}, ${Math.round(58*a + 24*(1-a))}, ${Math.round(138*a + 36*(1-a))})`;
+  }
+}
+
+let lockedDong = null;
+const layer = L.geoJSON(D.geo, {
+  style: f => ({
+    color: '#0a0a0f', weight: 0.8,
+    fillColor: colorFor(f.properties.rate),
+    fillOpacity: 0.92,
+  }),
+  onEachFeature: (f, l) => {
+    l.bindTooltip(`<b>${f.properties.dong}</b> (${f.properties.sgg_full||''})<br>순유출률: <b>${fmtPct(f.properties.rate)}</b><br>청년 인구: ${fmt(f.properties.youth_pop)}`, { sticky: true });
+    l.on('mouseover', e => { if (!lockedDong) showDong(f.properties); e.target.setStyle({weight: 2.5, color: '#facc15'}); });
+    l.on('mouseout',  e => { if (!lockedDong) e.target.setStyle({weight: 0.8, color: '#0a0a0f'}); });
+    l.on('click', () => {
+      lockedDong = (lockedDong === f.properties.dong) ? null : f.properties.dong;
+      showDong(f.properties);
+    });
+  },
+}).addTo(map);
+map.fitBounds(layer.getBounds(), { padding: [10, 10] });
+
+function showDong(p) {
+  document.getElementById('dong-name').textContent = p.dong + (lockedDong===p.dong ? ' 📌' : '');
+  document.getElementById('dong-sgg').textContent  = p.sgg_full || '';
+  const rate = p.rate;
+  const el = document.getElementById('dong-rate');
+  el.textContent = fmtPct(rate);
+  el.className = 'text-4xl font-bold ' + (rate>0?'text-orange-400':'text-sky-400');
+  document.getElementById('dong-in').textContent  = fmt(p.youth_in);
+  document.getElementById('dong-out').textContent = fmt(p.youth_out);
+  document.getElementById('dong-pop').textContent = fmt(p.youth_pop);
+  // top dest
+  const tops = D.od_out.filter(o => o.origin_dong === p.dong).slice(0, 5);
+  document.getElementById('dong-top-dest').innerHTML =
+    tops.length === 0 ? '<li class="text-zinc-600">데이터 없음</li>' :
+    tops.map(o => `<li class="flex justify-between items-center"><span class="text-zinc-300">${o.dest}</span><span class="num-tabular text-zinc-500">${fmt(o.n)}명</span></li>`).join('');
+}
+
+// 클릭 가능 TOP10에서 동 → map 강조
+document.querySelectorAll('[data-dong]').forEach(el => {
+  el.addEventListener('click', () => {
+    const dn = el.dataset.dong;
+    const feat = D.geo.features.find(f => f.properties.dong === dn);
+    if (!feat) return;
+    lockedDong = dn;
+    showDong(feat.properties);
+    map.fitBounds(L.geoJSON(feat).getBounds(), { padding: [40, 40], maxZoom: 14 });
+  });
+});
+
+
+// ── Sankey (Plotly)
+const sk = D.od_out;
+const origins = [...new Set(sk.map(d => d.origin_dong))];
+const dests   = [...new Set(sk.map(d => d.dest))];
+const labels  = [...origins, ...dests];
+const idx = Object.fromEntries(labels.map((l, i) => [l, i]));
+const BUNDANG = new Set(['분당동','수내1동','수내2동','수내3동','정자동','정자1동','정자2동','정자3동','이매1동','이매2동','서현1동','서현2동','야탑1동','야탑2동','야탑3동','금곡동','구미동','구미1동','판교동','삼평동','백현동','운중동']);
+const SUJEONG = new Set(['신흥1동','신흥2동','신흥3동','태평1동','태평2동','태평3동','태평4동','수진1동','수진2동','단대동','산성동','양지동','복정동','위례동','신촌동','고등동','시흥동']);
+const JUNGWON = new Set(['성남동','금광1동','금광2동','은행1동','은행2동','상대원1동','상대원2동','상대원3동','중앙동','도촌동','여수동','하대원동']);
+const colorOf = n => BUNDANG.has(n) ? 'rgba(56,189,248,0.9)'
+                  : SUJEONG.has(n) ? 'rgba(249,115,22,0.9)'
+                  : JUNGWON.has(n) ? 'rgba(168,85,247,0.9)'
+                  : 'rgba(120,120,140,0.55)';
+
+Plotly.newPlot('sankey', [{
+  type: 'sankey',
+  arrangement: 'snap',
+  node: {
+    label: labels,
+    pad: 12, thickness: 14,
+    color: labels.map(colorOf),
+    line: { color: 'transparent' },
+  },
+  link: {
+    source: sk.map(d => idx[d.origin_dong]),
+    target: sk.map(d => idx[d.dest]),
+    value:  sk.map(d => d.n),
+    color:  sk.map(d => {
+      const c = colorOf(d.origin_dong).replace('0.9', '0.25');
+      return c;
+    }),
+    hovertemplate: '%{source.label} → %{target.label}<br>청년 %{value}명<extra></extra>',
+  },
+}], {
+  paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+  font: { family: 'Pretendard', color: '#f4f4f8', size: 11 },
+  margin: { l: 8, r: 8, t: 8, b: 8 },
+}, { displayModeBar: false });
+
+
+// ── 시계열
+const sggColor = { '성남시 분당구': '#38bdf8', '성남시 수정구': '#f97316', '성남시 중원구': '#a855f7' };
+const sggBy = {};
+D.monthly_sgg.forEach(d => { (sggBy[d.sgg] = sggBy[d.sgg] || []).push(d); });
+Object.values(sggBy).forEach(a => a.sort((x,y)=>x.m.localeCompare(y.m)));
+
+Plotly.newPlot('ts-sgg', Object.entries(sggBy).map(([k,v]) => ({
+  x: v.map(d => d.m.slice(0,4)+'-'+d.m.slice(4)),
+  y: v.map(d => d.순이동),
+  type: 'scatter', mode: 'lines+markers',
+  name: k, line: { color: sggColor[k] || '#888', width: 2.5 }, marker: { size: 6 },
+  hovertemplate: '%{x}<br>순이동 %{y}명<extra>'+k+'</extra>',
+})), {
+  paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+  font: { family: 'Pretendard', color: '#f4f4f8', size: 10 },
+  xaxis: { gridcolor: '#252837', tickangle: -25 },
+  yaxis: { gridcolor: '#252837', zerolinecolor: '#444', title: '청년 순이동' },
+  margin: { l: 50, r: 8, t: 8, b: 50 },
+  legend: { orientation: 'h', y: -0.18, font: { size: 10 } },
+  hovermode: 'x unified',
+  shapes: [{ type:'line', x0:0, x1:1, y0:0, y1:0, xref:'paper', line:{color:'#666', dash:'dash', width:1} }],
+}, { displayModeBar: false });
+
+// 핫스팟 동 시계열
+const dongSums = {};
+D.monthly_dong.forEach(d => { dongSums[d.dong] = (dongSums[d.dong]||0) + d.순이동; });
+const sortedDongs = Object.entries(dongSums).sort((a,b)=>a[1]-b[1]);
+const hotspots = [...sortedDongs.slice(0,5), ...sortedDongs.slice(-5)].map(x=>x[0]);
+const dongBy = {};
+D.monthly_dong.filter(d => hotspots.includes(d.dong)).forEach(d => { (dongBy[d.dong] = dongBy[d.dong] || []).push(d); });
+Object.values(dongBy).forEach(a => a.sort((x,y)=>x.m.localeCompare(y.m)));
+const dongPalette = ['#38bdf8','#0ea5e9','#0284c7','#075985','#1e3a8a','#fb923c','#f97316','#ea580c','#c2410c','#7c2d12'];
+let pIdx = 0;
+const inSet = new Set(sortedDongs.slice(0,5).map(x=>x[0]));
+
+Plotly.newPlot('ts-dong', Object.entries(dongBy)
+  .sort((a,b) => dongSums[a[0]] - dongSums[b[0]])
+  .map(([k,v], i) => ({
+    x: v.map(d => d.m.slice(0,4)+'-'+d.m.slice(4)),
+    y: v.map(d => d.순이동),
+    type: 'scatter', mode: 'lines+markers',
+    name: k, line: { color: dongPalette[i], width: 2 }, marker: { size: 5 },
+    hovertemplate: '%{x}<br>순이동 %{y}명<extra>'+k+'</extra>',
+  })), {
+  paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+  font: { family: 'Pretendard', color: '#f4f4f8', size: 10 },
+  xaxis: { gridcolor: '#252837', tickangle: -25 },
+  yaxis: { gridcolor: '#252837', zerolinecolor: '#444', title: '청년 순이동' },
+  margin: { l: 50, r: 8, t: 8, b: 50 },
+  legend: { orientation: 'h', y: -0.22, font: { size: 9 }, traceorder: 'normal' },
+  hovermode: 'x unified',
+  shapes: [{ type:'line', x0:0, x1:1, y0:0, y1:0, xref:'paper', line:{color:'#666', dash:'dash', width:1} }],
+}, { displayModeBar: false });
+</script>
+
+</body>
+</html>

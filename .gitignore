@@ -1,0 +1,23 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+
+# Secrets
+.env
+
+# Raw data — 다운로드 받은 원본은 git에 안 올림 (35 MB+)
+data/raw/**/*.csv
+data/raw/**/*.xlsx
+data/raw/**/*.zip
+!data/raw/**/.gitkeep
+
+# Streamlit cache
+.streamlit/
+
+# Editor
+.vscode/
+.idea/
+data/geojson/gyeonggi_admdong.geojson
