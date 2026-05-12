@@ -1,0 +1,3 @@
+﻿iteration,stage,feature,corr,abs_corr,n
+1,raw_features,청년_인구,-0.3973358716364854,0.3973358716364854,50
+2,engineered_iter_2,청년_인구,-0.3973358716364854,0.3973358716364854,50

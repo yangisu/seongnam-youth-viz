@@ -52,8 +52,16 @@ python src/06_visualizations.py     # Folium/Plotly 산출물
 
 # 4. 대시보드 (옵션)
 streamlit run outputs/dashboard/app.py
+
+# 5. Iterative Optimization (CTO workflow)
+# - Re-plan automatically when correlations are weak
+# - Optional auto-download if AUTO_DOWNLOAD_MANIFEST.csv exists
+python src/08_iterative_optimizer.py --threshold 0.30 --max-iterations 4
+python src/08_iterative_optimizer.py --auto-download --threshold 0.30 --max-iterations 4
 ```
 
+Copy `docs/AUTO_DOWNLOAD_MANIFEST.example.csv` to
+`data/raw/AUTO_DOWNLOAD_MANIFEST.csv` and fill source URLs for auto-download.
 ## 데이터 출처 (모두 data.go.kr 또는 GitHub 공개)
 
 | 코드 | 출처 | 용도 |
