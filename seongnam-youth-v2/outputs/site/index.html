@@ -219,6 +219,22 @@ th{color:#a1a1aa;font-weight:600}
   </div>
 </section>
 
+<section id="ch-claim" class="max-w-7xl mx-auto px-6 py-12">
+  <div class="section-num mb-2">CHAPTER 04.5 · CLAIM CHAIN</div>
+  <h2 class="text-3xl font-bold mb-2">결론 도출 과정 (Claim → Data → Method → Number → Limitation)</h2>
+  <div class="card p-4 mb-6">
+    <div id="claim-bridge" class="axis-note"></div>
+  </div>
+  <div class="card p-4">
+    <div class="text-sm text-zinc-300 mb-2">주장 근거 체인</div>
+    <table id="tbl-claim-chain"></table>
+  </div>
+  <div class="card p-4 mt-6">
+    <div class="text-sm text-zinc-300 mb-2">과장 방지 해석 규칙</div>
+    <div id="claim-guardrail" class="axis-note"></div>
+  </div>
+</section>
+
 <section id="ch5" class="max-w-7xl mx-auto px-6 py-12">
   <div class="section-num mb-2">APPENDIX A · ITERATIVE LOOP</div>
   <h2 class="text-3xl font-bold mb-2">반복형 분석 루프 최적화 결과</h2>
@@ -268,7 +284,7 @@ function tableHtml(headers, rows){
 }
 
 const byRate = [...(D.dong||[])].sort((a,b)=>a['청년_순유출률']-b['청년_순유출률']);
-const sectionOrder = ['ch-intro','ch1','ch2','ch4','ch3','ch5','ch0'];
+const sectionOrder = ['ch-intro','ch1','ch2','ch4','ch-claim','ch3','ch5','ch0'];
 sectionOrder.forEach(id => {
   const el = document.getElementById(id);
   if (el) document.body.appendChild(el);
@@ -279,6 +295,7 @@ const methodTrace = [
   ['CH2 WHERE', '성남 내부 재배치 경로 식별', 'od_youth_intra_seongnam_dong', '동 OD -> 생활권 행렬 + 상위 경로 추출', '내부 이동 집중 통로 파악'],
   ['CH3 VALIDATION', '월별 상관 보조 검증', 'monthly OD + monthly complaints', '월집계 + 3/6/12개월 창 연관검정', '약한 상관 확인 후 중심 해석 축 전환'],
   ['CH4 MAIN EVIDENCE', '개입등급 + 신축/노후 지역군 비교', 'priority + policy_newold_axis/group/topic', '플래그 규칙/점수화 + 축 그룹 집계 + 토픽구성 비교', '정책 우선순위와 지역군별 구조 차이 해석'],
+  ['CH4.5 CLAIM CHAIN', '주장-근거 연결 검증', 'claim_chain_*.csv/json', '주장→데이터→처리식→수치→한계 표준화', '논리적 비약/과장 해석 방지'],
   ['CH5 ITERATIVE', '반복형 피처엔지니어링 효과', 'iterative correlations/recommendations', 'iteration별 최고 신호 추적 + 상호작용 분해', '재평가 루프로 신호 강화 확인'],
 ];
 document.getElementById('tbl-method-trace').innerHTML = tableHtml(
@@ -650,6 +667,34 @@ document.getElementById('chapter4-conclusion').innerHTML = [
   topA.length ? `즉시개입(A) 우선 생활권은 <b>${topA.join(', ')}</b>입니다.` : '즉시개입(A) 생활권은 없습니다.',
   strongest ? `정책지표 중 유출률과 가장 강한 연관은 <b>${strongest.x_variable}</b> (Spearman r=${n2(strongest.spearman_r)}, p=${n2(strongest.spearman_p)})입니다.` : ''
 ].filter(Boolean).join('<br>');
+
+const claimRowsRaw = (D.claim_chain_rows || []).slice();
+const claimRows = claimRowsRaw.map(r => ({
+  claim: String(r.claim ?? r.주장 ?? '-'),
+  data_used: String(r.data_used ?? r.data ?? r.데이터 ?? '-'),
+  processing_expr: String(r.processing_expr ?? r.processing ?? r.처리식 ?? '-'),
+  result_value: String(r.result_value ?? r.result ?? r.결과수치 ?? '-'),
+  limitation: String(r.limitation ?? r.한계 ?? '-'),
+}));
+const claimSources = (D.claim_chain_sources || []).filter(Boolean);
+document.getElementById('claim-bridge').innerHTML =
+  'CH4에서 제시한 지역군 근거를 그대로 결론으로 점프하지 않기 위해, 아래 Claim Chain에 각 주장별 데이터·처리식·수치·한계를 일렬로 공개합니다. ' +
+  '즉, “무엇을 근거로 어디까지 말할 수 있는지”를 심사자가 바로 추적할 수 있도록 구성했습니다.';
+document.getElementById('tbl-claim-chain').innerHTML = tableHtml(
+  ['주장', '데이터', '처리식', '결과수치', '한계'],
+  claimRows.length
+    ? claimRows.map(r => [r.claim, r.data_used, r.processing_expr, r.result_value, r.limitation])
+    : [[
+      'claim_chain_*.csv 대기',
+      claimSources.length ? claimSources.join(', ') : 'data/processed/claim_chain_*.csv',
+      '-',
+      '-',
+      '현재 입력 파일이 없어 표를 생성하지 못했습니다.'
+    ]]
+);
+document.getElementById('claim-guardrail').innerHTML =
+  '<b>상관≠인과</b>: 본 사이트의 상관/회귀 수치는 정책 우선순위 참고 신호이며 인과효과를 단정하지 않습니다.<br>' +
+  '<b>지역군 수준 해석</b>: 신축·재정비/노후·정체는 개별 동이 아닌 지역군 평균 경향으로, 개별 동 단위 판정에는 추가 검증이 필요합니다.';
 
 const rel = (D.policy_relations||[]).slice(0,8);
 if (rel.length){

@@ -69,6 +69,74 @@ def load_json(name: str) -> dict:
         return json.load(f)
 
 
+def _pick_col(cols: list[str], candidates: list[str]) -> str | None:
+    norm = {str(c).strip().lower().replace(" ", "").replace("_", ""): str(c) for c in cols}
+    for cand in candidates:
+        key = cand.strip().lower().replace(" ", "").replace("_", "")
+        if key in norm:
+            return norm[key]
+    return None
+
+
+def load_claim_chain_assets() -> tuple[pd.DataFrame, dict, list[str]]:
+    csv_paths = sorted(PROCESSED.glob("claim_chain_*.csv"))
+    json_paths = sorted(PROCESSED.glob("claim_chain_*.json"))
+
+    rows: list[pd.DataFrame] = []
+    for p in csv_paths:
+        try:
+            raw = pd.read_csv(p)
+        except Exception:  # noqa: BLE001
+            continue
+        if raw.empty:
+            continue
+        cols = [str(c) for c in raw.columns]
+        claim_col = _pick_col(cols, ["claim", "claim_text", "주장", "핵심주장", "assertion"])
+        data_col = _pick_col(cols, ["data", "데이터", "source_data", "근거데이터", "metric_name"])
+        processing_col = _pick_col(cols, ["processing", "처리식", "formula", "method"])
+        result_col = _pick_col(cols, ["result_value", "metric_value", "결과수치", "result", "metric", "수치"])
+        limit_col = _pick_col(cols, ["limitation", "한계", "limit", "caveat"])
+        if not all([claim_col, data_col, processing_col, result_col, limit_col]):
+            continue
+        normalized = raw[[claim_col, data_col, processing_col, result_col, limit_col]].rename(
+            columns={
+                claim_col: "claim",
+                data_col: "data_used",
+                processing_col: "processing_expr",
+                result_col: "result_value",
+                limit_col: "limitation",
+            }
+        )
+        interpretation_col = _pick_col(cols, ["interpretation", "해석", "interpret"])
+        if interpretation_col:
+            normalized["result_value"] = normalized["result_value"].astype(str) + " | " + raw[interpretation_col].astype(str)
+        normalized["source_file"] = p.name
+        rows.append(normalized)
+
+    claim_df = pd.concat(rows, ignore_index=True) if rows else pd.DataFrame(
+        columns=["claim", "data_used", "processing_expr", "result_value", "limitation", "source_file"]
+    )
+
+    meta: dict = {}
+    if json_paths:
+        for p in json_paths:
+            try:
+                with p.open("r", encoding="utf-8") as f:
+                    loaded = json.load(f)
+            except Exception:  # noqa: BLE001
+                continue
+            if isinstance(loaded, dict):
+                meta = loaded
+                meta.setdefault("source_file", p.name)
+                break
+            if isinstance(loaded, list):
+                meta = {"items": loaded, "source_file": p.name}
+                break
+
+    source_names = [p.name for p in csv_paths] + [p.name for p in json_paths]
+    return claim_df, meta, source_names
+
+
 def cluster_from_dong(d: str) -> str:
     if not d:
         return ""
@@ -228,6 +296,7 @@ def build_payload() -> tuple[dict, dict[str, pd.DataFrame]]:
     iterative_summary = load_json("iterative_optimizer_summary_v2.json")
     iterative_corr = load_csv("iterative_feature_correlation_v2.csv")
     iterative_reco = load_csv("iterative_visualization_recommendations_v2.csv")
+    claim_chain_rows, claim_chain_meta, claim_chain_sources = load_claim_chain_assets()
     axis_findings, axis_summary = build_axis_complaint_findings(priority)
     iterative_loop_progress = build_iterative_loop_progress(iterative_corr)
     axis_context_evidence = pd.DataFrame(AXIS_CONTEXT_EVIDENCE)
@@ -335,6 +404,9 @@ def build_payload() -> tuple[dict, dict[str, pd.DataFrame]]:
         "iterative_summary": iterative_summary,
         "iterative_corr": iterative_corr.to_dict(orient="records"),
         "iterative_reco": iterative_reco.to_dict(orient="records"),
+        "claim_chain_rows": claim_chain_rows.to_dict(orient="records"),
+        "claim_chain_meta": claim_chain_meta,
+        "claim_chain_sources": claim_chain_sources,
         "axis_findings": axis_findings.to_dict(orient="records"),
         "axis_summary": axis_summary.to_dict(orient="records"),
         "axis_context_evidence": axis_context_evidence.to_dict(orient="records"),
@@ -367,6 +439,7 @@ def build_payload() -> tuple[dict, dict[str, pd.DataFrame]]:
         "chapter4_axis_complaint_findings.csv": axis_findings,
         "chapter4_axis_complaint_summary.csv": axis_summary,
         "chapter4_axis_context_evidence.csv": axis_context_evidence,
+        "chapter4_claim_chain_table.csv": claim_chain_rows,
         "chapter4_cross_section_tests.csv": tests,
         "chapter4_policy_relations.csv": policy_relations,
         "chapter4_models.csv": models,
@@ -442,6 +515,7 @@ def write_traceability_doc() -> None:
 ## Chapter 4 (MAIN EVIDENCE: 정책 우선순위 + 신축/노후 지역군)
 - What was analyzed:
   - Intervention tiers (A/B/C/D) and axis differences (`신축·재정비` vs `노후·정체`) in complaint/outflow patterns.
+  - Claim chain to make conclusion derivation explicit (claim -> data -> processing -> numeric result -> limitation).
 - Data used:
   - `complaint_mobility_join_2024.csv`
   - `cluster_month_panel_2024.csv`
@@ -450,6 +524,8 @@ def write_traceability_doc() -> None:
   - `policy_newold_axis_mapping_by_cluster_2024.csv`
   - `policy_newold_group_comparison_2024.csv`
   - `policy_newold_topic_group_comparison_2024.csv`
+  - `claim_chain_*.csv`
+  - `claim_chain_*.json`
   - `Seongnam Youth Polarization _standalone_.html` (axis-definition context labels)
 - Processing:
   - High-outflow / persistent-outflow / high-complaint flags and weighted priority scoring.
@@ -462,6 +538,7 @@ def write_traceability_doc() -> None:
 - Site outputs:
   - Tier criteria, priority, risk charts + axis complaint visual and axis summary table.
   - Alternative-view charts: destination-bucket composition and concentration(HHI).
+  - Claim chain table + anti-overclaim guardrails.
   - `outputs/site/chart_data/chapter4_priority_matrix.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_axis_mapping.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_group_comparison.csv`
@@ -473,6 +550,7 @@ def write_traceability_doc() -> None:
   - `outputs/site/chart_data/chapter4_axis_complaint_findings.csv`
   - `outputs/site/chart_data/chapter4_axis_complaint_summary.csv`
   - `outputs/site/chart_data/chapter4_axis_context_evidence.csv`
+  - `outputs/site/chart_data/chapter4_claim_chain_table.csv`
   - `outputs/site/chart_data/chapter4_cross_section_tests.csv`
   - `outputs/site/chart_data/chapter4_policy_relations.csv`
   - `outputs/site/chart_data/chapter4_models.csv`
@@ -722,6 +800,22 @@ th{color:#a1a1aa;font-weight:600}
   </div>
 </section>
 
+<section id=\"ch-claim\" class=\"max-w-7xl mx-auto px-6 py-12\">
+  <div class=\"section-num mb-2\">CHAPTER 04.5 · CLAIM CHAIN</div>
+  <h2 class=\"text-3xl font-bold mb-2\">결론 도출 과정 (Claim → Data → Method → Number → Limitation)</h2>
+  <div class=\"card p-4 mb-6\">
+    <div id=\"claim-bridge\" class=\"axis-note\"></div>
+  </div>
+  <div class=\"card p-4\">
+    <div class=\"text-sm text-zinc-300 mb-2\">주장 근거 체인</div>
+    <table id=\"tbl-claim-chain\"></table>
+  </div>
+  <div class=\"card p-4 mt-6\">
+    <div class=\"text-sm text-zinc-300 mb-2\">과장 방지 해석 규칙</div>
+    <div id=\"claim-guardrail\" class=\"axis-note\"></div>
+  </div>
+</section>
+
 <section id=\"ch5\" class=\"max-w-7xl mx-auto px-6 py-12\">
   <div class=\"section-num mb-2\">APPENDIX A · ITERATIVE LOOP</div>
   <h2 class=\"text-3xl font-bold mb-2\">반복형 분석 루프 최적화 결과</h2>
@@ -771,7 +865,7 @@ function tableHtml(headers, rows){
 }
 
 const byRate = [...(D.dong||[])].sort((a,b)=>a['청년_순유출률']-b['청년_순유출률']);
-const sectionOrder = ['ch-intro','ch1','ch2','ch4','ch3','ch5','ch0'];
+const sectionOrder = ['ch-intro','ch1','ch2','ch4','ch-claim','ch3','ch5','ch0'];
 sectionOrder.forEach(id => {
   const el = document.getElementById(id);
   if (el) document.body.appendChild(el);
@@ -782,6 +876,7 @@ const methodTrace = [
   ['CH2 WHERE', '성남 내부 재배치 경로 식별', 'od_youth_intra_seongnam_dong', '동 OD -> 생활권 행렬 + 상위 경로 추출', '내부 이동 집중 통로 파악'],
   ['CH3 VALIDATION', '월별 상관 보조 검증', 'monthly OD + monthly complaints', '월집계 + 3/6/12개월 창 연관검정', '약한 상관 확인 후 중심 해석 축 전환'],
   ['CH4 MAIN EVIDENCE', '개입등급 + 신축/노후 지역군 비교', 'priority + policy_newold_axis/group/topic', '플래그 규칙/점수화 + 축 그룹 집계 + 토픽구성 비교', '정책 우선순위와 지역군별 구조 차이 해석'],
+  ['CH4.5 CLAIM CHAIN', '주장-근거 연결 검증', 'claim_chain_*.csv/json', '주장→데이터→처리식→수치→한계 표준화', '논리적 비약/과장 해석 방지'],
   ['CH5 ITERATIVE', '반복형 피처엔지니어링 효과', 'iterative correlations/recommendations', 'iteration별 최고 신호 추적 + 상호작용 분해', '재평가 루프로 신호 강화 확인'],
 ];
 document.getElementById('tbl-method-trace').innerHTML = tableHtml(
@@ -1153,6 +1248,34 @@ document.getElementById('chapter4-conclusion').innerHTML = [
   topA.length ? `즉시개입(A) 우선 생활권은 <b>${topA.join(', ')}</b>입니다.` : '즉시개입(A) 생활권은 없습니다.',
   strongest ? `정책지표 중 유출률과 가장 강한 연관은 <b>${strongest.x_variable}</b> (Spearman r=${n2(strongest.spearman_r)}, p=${n2(strongest.spearman_p)})입니다.` : ''
 ].filter(Boolean).join('<br>');
+
+const claimRowsRaw = (D.claim_chain_rows || []).slice();
+const claimRows = claimRowsRaw.map(r => ({
+  claim: String(r.claim ?? r.주장 ?? '-'),
+  data_used: String(r.data_used ?? r.data ?? r.데이터 ?? '-'),
+  processing_expr: String(r.processing_expr ?? r.processing ?? r.처리식 ?? '-'),
+  result_value: String(r.result_value ?? r.result ?? r.결과수치 ?? '-'),
+  limitation: String(r.limitation ?? r.한계 ?? '-'),
+}));
+const claimSources = (D.claim_chain_sources || []).filter(Boolean);
+document.getElementById('claim-bridge').innerHTML =
+  'CH4에서 제시한 지역군 근거를 그대로 결론으로 점프하지 않기 위해, 아래 Claim Chain에 각 주장별 데이터·처리식·수치·한계를 일렬로 공개합니다. ' +
+  '즉, “무엇을 근거로 어디까지 말할 수 있는지”를 심사자가 바로 추적할 수 있도록 구성했습니다.';
+document.getElementById('tbl-claim-chain').innerHTML = tableHtml(
+  ['주장', '데이터', '처리식', '결과수치', '한계'],
+  claimRows.length
+    ? claimRows.map(r => [r.claim, r.data_used, r.processing_expr, r.result_value, r.limitation])
+    : [[
+      'claim_chain_*.csv 대기',
+      claimSources.length ? claimSources.join(', ') : 'data/processed/claim_chain_*.csv',
+      '-',
+      '-',
+      '현재 입력 파일이 없어 표를 생성하지 못했습니다.'
+    ]]
+);
+document.getElementById('claim-guardrail').innerHTML =
+  '<b>상관≠인과</b>: 본 사이트의 상관/회귀 수치는 정책 우선순위 참고 신호이며 인과효과를 단정하지 않습니다.<br>' +
+  '<b>지역군 수준 해석</b>: 신축·재정비/노후·정체는 개별 동이 아닌 지역군 평균 경향으로, 개별 동 단위 판정에는 추가 검증이 필요합니다.';
 
 const rel = (D.policy_relations||[]).slice(0,8);
 if (rel.length){

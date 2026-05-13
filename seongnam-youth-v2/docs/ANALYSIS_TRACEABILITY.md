@@ -55,6 +55,7 @@
 ## Chapter 4 (MAIN EVIDENCE: 정책 우선순위 + 신축/노후 지역군)
 - What was analyzed:
   - Intervention tiers (A/B/C/D) and axis differences (`신축·재정비` vs `노후·정체`) in complaint/outflow patterns.
+  - Claim chain to make conclusion derivation explicit (claim -> data -> processing -> numeric result -> limitation).
 - Data used:
   - `complaint_mobility_join_2024.csv`
   - `cluster_month_panel_2024.csv`
@@ -63,6 +64,8 @@
   - `policy_newold_axis_mapping_by_cluster_2024.csv`
   - `policy_newold_group_comparison_2024.csv`
   - `policy_newold_topic_group_comparison_2024.csv`
+  - `claim_chain_*.csv`
+  - `claim_chain_*.json`
   - `Seongnam Youth Polarization _standalone_.html` (axis-definition context labels)
 - Processing:
   - High-outflow / persistent-outflow / high-complaint flags and weighted priority scoring.
@@ -75,6 +78,7 @@
 - Site outputs:
   - Tier criteria, priority, risk charts + axis complaint visual and axis summary table.
   - Alternative-view charts: destination-bucket composition and concentration(HHI).
+  - Claim chain table + anti-overclaim guardrails.
   - `outputs/site/chart_data/chapter4_priority_matrix.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_axis_mapping.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_group_comparison.csv`
@@ -86,6 +90,7 @@
   - `outputs/site/chart_data/chapter4_axis_complaint_findings.csv`
   - `outputs/site/chart_data/chapter4_axis_complaint_summary.csv`
   - `outputs/site/chart_data/chapter4_axis_context_evidence.csv`
+  - `outputs/site/chart_data/chapter4_claim_chain_table.csv`
   - `outputs/site/chart_data/chapter4_cross_section_tests.csv`
   - `outputs/site/chart_data/chapter4_policy_relations.csv`
   - `outputs/site/chart_data/chapter4_models.csv`
