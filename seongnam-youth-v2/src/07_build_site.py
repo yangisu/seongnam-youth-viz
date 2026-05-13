@@ -1396,12 +1396,14 @@ def build_html() -> str:
     document.getElementById('final-claim-title').textContent = '최종 주장: 성남 청년 양극화의 축은 신축 vs 노후 지역군이다';
     document.getElementById('final-claim-summary').innerHTML = [
       `구(區) 평균이 아니라 <b>동 클러스터(지역군)</b> 단위에서 청년 이동 압력의 구조적 차이가 나타났습니다.`,
-      `정책 적용 단위는 “분당/수정”보다 <b>A·B 우선개입 생활권(${abTargets.length}개)</b>이 더 직접적입니다.`
+      `정책 적용 단위는 “분당/수정”보다 <b>A·B 우선개입 생활권(${abTargets.length}개)</b>이 더 직접적입니다.`,
+      `특히 <b>개입 위험 등급 도표</b>는 대상 선정 근거를 시각적으로 일관되게 제시해, 예산·인력 배분의 설득력과 실행 속도를 높입니다.`
     ].join(' ');
     const finalPoints = [
       `분당구 순이동 <b>${bundangRow && netKey ? signedInt(bundangRow[netKey]) : '—'}명</b>, 수정구 순이동 <b>${sujeongRow && netKey ? signedInt(sujeongRow[netKey]) : '—'}명</b>`,
       `최대 순유입 <b>${topInflow.length ? `${topInflow[0].dong} (${pct(topInflow[0]['청년_순유출률'])})` : '—'}</b> / 최대 순유출 <b>${topOutflow.length ? `${topOutflow[0].dong} (${pct(topOutflow[0]['청년_순유출률'])})` : '—'}</b>`,
-      strongest ? `근거 강화: <b>${strongest.x_variable}</b>가 유출률과 가장 강한 연관 (Spearman r=${n2(strongest.spearman_r)}, p=${n2(strongest.spearman_p)})` : '근거 강화: 유의한 연관 변수는 추가 검증이 필요'
+      strongest ? `근거 강화: <b>${strongest.x_variable}</b>가 유출률과 가장 강한 연관 (Spearman r=${n2(strongest.spearman_r)}, p=${n2(strongest.spearman_p)})` : '근거 강화: 유의한 연관 변수는 추가 검증이 필요',
+      `실행 효과: 위험도 맵의 <b>A(즉시개입)·B(우선개입)</b> 구분으로 “어디부터 개입할지”를 명확히 하여, 정책 우선순위 합의와 성과관리(모니터링 지표 설정)에 긍정적 영향을 줍니다.`
     ];
     document.getElementById('final-claim-points').innerHTML = finalPoints.map(t => `<li class="list-disc ml-5">${t}</li>`).join('');
 
