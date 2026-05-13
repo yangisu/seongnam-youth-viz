@@ -1,615 +1,698 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>성남 청년 이동·생활마찰 분석 (V2)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<script src="./data.js"></script>
-<style>
-:root {
-  --bg:#0a0a0f; --bg-soft:#11121a; --card:#161824; --border:#252837;
-  --text:#f4f4f8; --dim:#8a8c9d; --out:#f97316; --in:#38bdf8; --gold:#facc15;
-}
-html,body{background:var(--bg);color:var(--text);font-family:'Pretendard Variable',Pretendard,sans-serif}
-.grain{background-image:radial-gradient(at 20% 10%,rgba(249,115,22,.10) 0%,transparent 40%),radial-gradient(at 80% 90%,rgba(56,189,248,.10) 0%,transparent 40%),radial-gradient(at 50% 50%,rgba(250,204,21,.04) 0%,transparent 60%)}
-.card{background:var(--card);border:1px solid var(--border);border-radius:18px}
-.section-num{display:inline-block;font-size:11px;letter-spacing:.3em;color:var(--dim);padding-bottom:4px;border-bottom:1px solid var(--border)}
-.punchline{background:linear-gradient(120deg,#f97316 0%,#facc15 50%,#38bdf8 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.leaflet-container{background:var(--bg-soft);border-radius:14px}
-.leaflet-tooltip{background:var(--card);color:var(--text);border:1px solid var(--border);font-size:12px}
-.axis-note{font-size:12px;color:#a1a1aa;border-left:3px solid #374151;padding-left:10px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{border-bottom:1px solid #252837;padding:8px 10px;text-align:left}
-th{color:#a1a1aa;font-weight:600}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>성남 청년 이동·생활마찰 분석 (V2)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="./data.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg-soft: #11121a;
+      --card: #161824;
+      --border: #252837;
+      --text: #f4f4f8;
+      --dim: #8a8c9d;
+      --out: #f97316;
+      --in: #38bdf8;
+      --gold: #facc15;
+    }
+
+    html,
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Pretendard Variable', Pretendard, sans-serif
+    }
+
+    .grain {
+      background-image: radial-gradient(at 20% 10%, rgba(249, 115, 22, .10) 0%, transparent 40%), radial-gradient(at 80% 90%, rgba(56, 189, 248, .10) 0%, transparent 40%), radial-gradient(at 50% 50%, rgba(250, 204, 21, .04) 0%, transparent 60%)
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px
+    }
+
+    .section-num {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: .3em;
+      color: var(--dim);
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .punchline {
+      background: linear-gradient(120deg, #f97316 0%, #facc15 50%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .leaflet-container {
+      background: var(--bg-soft);
+      border-radius: 14px
+    }
+
+    .leaflet-tooltip {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 12px
+    }
+
+    .axis-note {
+      font-size: 12px;
+      color: #a1a1aa;
+      border-left: 3px solid #374151;
+      padding-left: 10px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #252837;
+      padding: 8px 10px;
+      text-align: left
+    }
+
+    th {
+      color: #a1a1aa;
+      font-weight: 600
+    }
+  </style>
 </head>
+
 <body class="grain">
-<header class="max-w-7xl mx-auto px-6 pt-10 pb-6">
-  <div class="section-num mb-3">SEONGNAM YOUTH POLARIZATION · V2</div>
-  <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-4">어디서 빠지고,<br><span class="punchline">어디서 다시 재배치되는가</span></h1>
-  <p class="text-lg text-zinc-400 max-w-4xl">핵심 흐름은 `공간(어디)` → `재배치 경로(어디로)` → `구조축(신축/노후 지역군)` → `결론 도출 검증(Claim Chain)`입니다.</p>
-</header>
+  <header class="max-w-7xl mx-auto px-6 pt-10 pb-6">
+    <div class="section-num mb-3">SEONGNAM YOUTH POLARIZATION · V2</div>
+    <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-4">판교의 빛은<br><span class="punchline">이미
+        식었다</span></h1>
+    <p class="text-lg text-zinc-400 max-w-4xl">성남시 청년 유출 양극화 문제 솔루션 - 핵심 흐름은 `공간(어디)` → `재배치 경로(어디로)` → `구조축(신축/노후 지역군)`
+      → `결론 도출 검증(Claim Chain)`입니다.</p>
+  </header>
 
-<section id="ch-intro" class="max-w-7xl mx-auto px-6 py-4">
-  <div class="section-num mb-2">EXECUTIVE SUMMARY</div>
-  <h2 class="text-3xl font-bold mb-2">심사위원용 결론 요약</h2>
-  <div class="grid lg:grid-cols-2 gap-6">
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">핵심 결론</div>
-      <div id="intro-conclusion" class="text-base leading-7 text-zinc-200"></div>
-    </div>
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">즉시개입(A) + 우선개입(B) 생활권</div>
-      <div id="intro-priority" class="text-base leading-7 text-zinc-200"></div>
-    </div>
-  </div>
-</section>
-
-<section id="ch0" class="max-w-7xl mx-auto px-6 py-4">
-  <div class="section-num mb-2">APPENDIX B · TRACEABILITY</div>
-  <h2 class="text-3xl font-bold mb-2">분석 추적성 매트릭스 (무엇/데이터/처리/의미)</h2>
-  <div class="card p-4 mb-8">
-    <div class="axis-note mb-3">각 분석별로 무엇을 봤는지, 어떤 데이터를 썼는지, 어떻게 가공했는지, 결과가 정책적으로 무엇을 뜻하는지까지 한 줄로 연결합니다.</div>
-    <table id="tbl-method-trace"></table>
-  </div>
-  <div class="card p-4">
-    <div class="text-sm text-zinc-300 mb-2">이해 흐름 가이드</div>
-    <div class="axis-note">CH1에서 순유출 hotspot을 식별하고, CH2에서 실제 내부 재배치 통로를 확인한 뒤, CH3에서 `신축·재정비 vs 노후·정체 지역군` 차이를 핵심 근거로 제시합니다. CH4는 결론 도출 과정을 주장-근거 체인으로 검증합니다.</div>
-  </div>
-</section>
-
-<section id="ch1" class="max-w-7xl mx-auto px-6 py-4">
-  <div class="section-num mb-2">CHAPTER 01 · WHAT</div>
-  <h2 class="text-3xl font-bold mb-2">동별 청년 순유출률 지도</h2>
-  <div class="grid lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 card p-3">
-      <div id="map" style="height:540px"></div>
-      <div class="axis-note mt-3">색상 단위: 청년 순유출률(%). 빨강=순유출, 파랑=순유입. 우측 TOP5는 성남 내부 동→동 도착지입니다.</div>
-    </div>
-    <div class="card p-5">
-      <div class="text-xs text-zinc-500 mb-1">선택된 행정동</div>
-      <div id="dong-name" class="text-5xl font-black mb-1">-</div>
-      <div id="dong-sgg" class="text-zinc-400 mb-6">-</div>
-      <div class="text-xs text-zinc-500 mb-1">청년 순유출률</div>
-      <div id="dong-rate" class="text-6xl font-black mb-6">-</div>
-      <div class="grid grid-cols-3 gap-2 text-center mb-5">
-        <div><div class="text-zinc-500 text-[11px]">전입(명)</div><div id="dong-in" class="text-sky-400 font-bold">-</div></div>
-        <div><div class="text-zinc-500 text-[11px]">전출(명)</div><div id="dong-out" class="text-orange-400 font-bold">-</div></div>
-        <div><div class="text-zinc-500 text-[11px]">청년 인구(명)</div><div id="dong-pop" class="font-bold">-</div></div>
+  <section id="ch-intro" class="max-w-7xl mx-auto px-6 py-4">
+    <div class="section-num mb-2">EXECUTIVE SUMMARY</div>
+    <h2 class="text-3xl font-bold mb-2">심사위원용 결론 요약</h2>
+    <div class="grid lg:grid-cols-2 gap-6">
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">핵심 결론</div>
+        <div id="intro-conclusion" class="text-base leading-7 text-zinc-200"></div>
       </div>
-      <div class="text-xs text-zinc-500 mb-2">성남 내부 주요 도착지 TOP5</div>
-      <ul id="dong-top-dest" class="space-y-1 text-sm"></ul>
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">즉시개입(A) + 우선개입(B) 생활권</div>
+        <div id="intro-priority" class="text-base leading-7 text-zinc-200"></div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="ch2" class="max-w-7xl mx-auto px-6 py-12">
-  <div class="section-num mb-2">CHAPTER 02 · WHERE</div>
-  <h2 class="text-3xl font-bold mb-2">성남 내부 재배치 구조</h2>
-  <div class="grid lg:grid-cols-2 gap-6">
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">생활권 간 이동 히트맵 (상위 12개 생활권)</div>
-      <div class="axis-note mb-2">X축: 도착 생활권, Y축: 출발 생활권, 색상: 이동 인원(명). 값이 클수록 이동 집중.</div>
-      <div id="heat-intra" style="height:430px"></div>
-    </div>
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">상위 생활권 이동쌍 TOP 10</div>
-      <div class="axis-note mb-2">성남 내부에서 실제로 이동량이 큰 출발→도착 조합이며, 전체 내부이동 대비 비중(%)은 “어느 통로에 이동 압력이 몰리는지”를 보여줍니다.</div>
-      <table id="tbl-pairs"></table>
-    </div>
-  </div>
-  <div class="card p-4 mt-6">
-    <div class="text-sm text-zinc-300 mb-2">히트맵 해석</div>
-    <div id="chapter2-heat-interpret" class="axis-note"></div>
-  </div>
-  <div class="card p-4 mt-6">
-    <div class="text-sm text-zinc-300 mb-2">왜 중요한가?</div>
-    <div id="chapter2-meaning" class="axis-note"></div>
-  </div>
-</section>
-
-<section id="ch4" class="max-w-7xl mx-auto px-6 py-12">
-  <div class="section-num mb-2">CHAPTER 03 · MAIN EVIDENCE</div>
-  <h2 class="text-3xl font-bold mb-2">신축/노후 지역군 중심 정책 근거</h2>
-  <div class="card p-4 mb-6">
-    <div class="axis-note">여기서 `신축·재정비`, `노후·정체`는 개별 행정동을 묶은 <b>지역군(생활권 클러스터)</b>입니다. 즉 “지역 분류”가 맞습니다.</div>
-  </div>
-  <div class="grid lg:grid-cols-2 gap-6">
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">개입 등급(A/B/C/D) 기준</div>
-      <div class="axis-note mb-3">A: 고유출·지속유출·고민원 3개 플래그 동시 충족. B: 2개, C: 1개, D: 0개.</div>
-      <table id="tbl-criteria"></table>
+  <section id="ch0" class="max-w-7xl mx-auto px-6 py-4">
+    <div class="section-num mb-2">APPENDIX B · TRACEABILITY</div>
+    <h2 class="text-3xl font-bold mb-2">분석 추적성 매트릭스 (무엇/데이터/처리/의미)</h2>
+    <div class="card p-4 mb-8">
+      <div class="axis-note mb-3">각 분석별로 무엇을 봤는지, 어떤 데이터를 썼는지, 어떻게 가공했는지, 결과가 정책적으로 무엇을 뜻하는지까지 한 줄로 연결합니다.</div>
+      <table id="tbl-method-trace"></table>
     </div>
     <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">A/B 등급 우선 생활권</div>
-      <table id="tbl-priority"></table>
+      <div class="text-sm text-zinc-300 mb-2">이해 흐름 가이드</div>
+      <div class="axis-note">CH1에서 순유출 hotspot을 식별하고, CH2에서 실제 내부 재배치 통로를 확인한 뒤, CH3에서 `신축·재정비 vs 노후·정체 지역군` 차이를 핵심 근거로
+        제시합니다. CH4는 결론 도출 과정을 주장-근거 체인으로 검증합니다.</div>
     </div>
-  </div>
-  <div class="grid lg:grid-cols-3 gap-6 mt-6">
+  </section>
+
+  <section id="ch1" class="max-w-7xl mx-auto px-6 py-4">
+    <div class="section-num mb-2">CHAPTER 01 · WHAT</div>
+    <h2 class="text-3xl font-bold mb-2">동별 청년 순유출률 지도</h2>
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 card p-3">
+        <div id="map" style="height:540px"></div>
+        <div class="axis-note mt-3">색상 단위: 청년 순유출률(%). 빨강=순유출, 파랑=순유입. 우측 TOP5는 성남 내부 동→동 도착지입니다.</div>
+      </div>
+      <div class="card p-5">
+        <div class="text-xs text-zinc-500 mb-1">선택된 행정동</div>
+        <div id="dong-name" class="text-5xl font-black mb-1">-</div>
+        <div id="dong-sgg" class="text-zinc-400 mb-6">-</div>
+        <div class="text-xs text-zinc-500 mb-1">청년 순유출률</div>
+        <div id="dong-rate" class="text-6xl font-black mb-6">-</div>
+        <div class="grid grid-cols-3 gap-2 text-center mb-5">
+          <div>
+            <div class="text-zinc-500 text-[11px]">전입(명)</div>
+            <div id="dong-in" class="text-sky-400 font-bold">-</div>
+          </div>
+          <div>
+            <div class="text-zinc-500 text-[11px]">전출(명)</div>
+            <div id="dong-out" class="text-orange-400 font-bold">-</div>
+          </div>
+          <div>
+            <div class="text-zinc-500 text-[11px]">청년 인구(명)</div>
+            <div id="dong-pop" class="font-bold">-</div>
+          </div>
+        </div>
+        <div class="text-xs text-zinc-500 mb-2">성남 내부 주요 도착지 TOP5</div>
+        <ul id="dong-top-dest" class="space-y-1 text-sm"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="ch2" class="max-w-7xl mx-auto px-6 py-12">
+    <div class="section-num mb-2">CHAPTER 02 · WHERE</div>
+    <h2 class="text-3xl font-bold mb-2">성남 내부 재배치 구조</h2>
+    <div class="grid lg:grid-cols-2 gap-6">
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">생활권 간 이동 히트맵 (상위 12개 생활권)</div>
+        <div class="axis-note mb-2">X축: 도착 생활권, Y축: 출발 생활권, 색상: 이동 인원(명). 값이 클수록 이동 집중.</div>
+        <div id="heat-intra" style="height:430px"></div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">상위 생활권 이동쌍 TOP 10</div>
+        <div class="axis-note mb-2">성남 내부에서 실제로 이동량이 큰 출발→도착 조합이며, 전체 내부이동 대비 비중(%)은 “어느 통로에 이동 압력이 몰리는지”를 보여줍니다.</div>
+        <table id="tbl-pairs"></table>
+      </div>
+    </div>
+    <div class="card p-4 mt-6">
+      <div class="text-sm text-zinc-300 mb-2">히트맵 해석</div>
+      <div id="chapter2-heat-interpret" class="axis-note"></div>
+    </div>
+    <div class="card p-4 mt-6">
+      <div class="text-sm text-zinc-300 mb-2">왜 중요한가?</div>
+      <div id="chapter2-meaning" class="axis-note"></div>
+    </div>
+  </section>
+
+  <section id="ch4" class="max-w-7xl mx-auto px-6 py-12">
+    <div class="section-num mb-2">CHAPTER 03 · MAIN EVIDENCE</div>
+    <h2 class="text-3xl font-bold mb-2">신축/노후 지역군 중심 정책 근거</h2>
+    <div class="card p-4 mb-6">
+      <div class="axis-note">여기서 `신축·재정비`, `노후·정체`는 개별 행정동을 묶은 <b>지역군(생활권 클러스터)</b>입니다. 즉 “지역 분류”가 맞습니다.</div>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-6">
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">개입 등급(A/B/C/D) 기준</div>
+        <div class="axis-note mb-3">A: 고유출·지속유출·고민원 3개 플래그 동시 충족. B: 2개, C: 1개, D: 0개.</div>
+        <table id="tbl-criteria"></table>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">A/B 등급 우선 생활권</div>
+        <table id="tbl-priority"></table>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-3 gap-6 mt-6">
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">개입 등급 분포</div>
+        <div id="chart-tier-bar" style="height:280px"></div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">개입 등급 위험도 맵</div>
+        <div class="axis-note mb-2">X축: 6개월 순유출률(%), Y축: 순유출 월 비중(%), 점 크기: 민원강도, 색상: 개입등급</div>
+        <div id="chart-tier-risk" style="height:320px"></div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">핵심 도표: 지역군별 민원강도 분포</div>
+        <div class="axis-note mb-2">X축=지역군, Y축=총인구 1천명당 민원강도. PC 화면에서 위험도 맵과 나란히 비교해 해석합니다.</div>
+        <div id="chart-axis-complaint" style="height:320px"></div>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-6 mt-6">
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">대체 관점 1: 지역군별 외부 유출 목적지 구성</div>
+        <div class="axis-note mb-2">동일한 유출이라도 신축·재정비와 노후·정체 지역군은 도착 권역 구성이 다릅니다.</div>
+        <div id="chart-axis-dest-mix" style="height:340px"></div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">목적지 편중 요약(HHI)</div>
+        <table id="tbl-axis-dest-concentration"></table>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-6 mt-6">
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">지역군 요약 (민원/유출/A·B 비중)</div>
+        <table id="tbl-axis-findings"></table>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">지역군 구성 행정동</div>
+        <table id="tbl-axis-regions"></table>
+      </div>
+    </div>
+    <div class="card p-4 mt-6">
+      <div class="text-sm text-zinc-300 mb-2">대체 관점: 지역군별 민원 토픽 구성 차이</div>
+      <div class="axis-note mb-2">상관이 약할 때는 “수준(level)”보다 “구성(composition)” 차이를 본다는 관점입니다. 값(신축비중-노후비중)이 +면 신축·재정비에서
+        상대적으로 더 비중이 큽니다.</div>
+      <div id="chart-axis-topic-diff" style="height:340px"></div>
+    </div>
+    <div class="card p-4 mt-6">
+      <div class="text-sm text-zinc-300 mb-2">신축/노후 축 정의 근거 (첨부 파일 반영)</div>
+      <div class="axis-note mb-2">축 정의는 첨부된 standalone 결과의 핵심 라벨(유입 핫스팟/유출 핫스팟)을 기준으로 현재 민원 분석에 매핑했습니다.</div>
+      <table id="tbl-axis-context"></table>
+    </div>
+    <div class="card p-4 mt-6">
+      <div class="text-sm text-zinc-300 mb-2">해석 결론</div>
+      <div id="chapter4-conclusion" class="text-sm leading-7 text-zinc-300"></div>
+    </div>
+    <div class="grid lg:grid-cols-3 gap-6 mt-6">
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">핵심 변수 연관검정</div>
+        <table id="tbl-tests"></table>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">민감도 분석</div>
+        <table id="tbl-sens"></table>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm text-zinc-300 mb-2">지표 정의</div>
+        <table id="tbl-vars"></table>
+      </div>
+    </div>
+  </section>
+
+  <section id="ch-claim" class="max-w-7xl mx-auto px-6 py-12">
+    <div class="section-num mb-2">CHAPTER 04 · CLAIM CHAIN</div>
+    <h2 class="text-3xl font-bold mb-2">결론 도출 과정 (Claim → Data → Method → Number → Limitation)</h2>
+    <div class="card p-4 mb-6">
+      <div id="claim-bridge" class="axis-note"></div>
+    </div>
     <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">개입 등급 분포</div>
-      <div id="chart-tier-bar" style="height:280px"></div>
+      <div class="text-sm text-zinc-300 mb-2">주장 근거 체인</div>
+      <table id="tbl-claim-chain"></table>
     </div>
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">개입 등급 위험도 맵</div>
-      <div class="axis-note mb-2">X축: 6개월 순유출률(%), Y축: 순유출 월 비중(%), 점 크기: 민원강도, 색상: 개입등급</div>
-      <div id="chart-tier-risk" style="height:320px"></div>
+    <div class="card p-4 mt-6">
+      <div class="text-sm text-zinc-300 mb-2">과장 방지 해석 규칙</div>
+      <div id="claim-guardrail" class="axis-note"></div>
     </div>
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">핵심 도표: 지역군별 민원강도 분포</div>
-      <div class="axis-note mb-2">X축=지역군, Y축=총인구 1천명당 민원강도. PC 화면에서 위험도 맵과 나란히 비교해 해석합니다.</div>
-      <div id="chart-axis-complaint" style="height:320px"></div>
-    </div>
-  </div>
-  <div class="grid lg:grid-cols-2 gap-6 mt-6">
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">대체 관점 1: 지역군별 외부 유출 목적지 구성</div>
-      <div class="axis-note mb-2">동일한 유출이라도 신축·재정비와 노후·정체 지역군은 도착 권역 구성이 다릅니다.</div>
-      <div id="chart-axis-dest-mix" style="height:340px"></div>
-    </div>
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">목적지 편중 요약(HHI)</div>
-      <table id="tbl-axis-dest-concentration"></table>
-    </div>
-  </div>
-  <div class="grid lg:grid-cols-2 gap-6 mt-6">
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">지역군 요약 (민원/유출/A·B 비중)</div>
-      <table id="tbl-axis-findings"></table>
-    </div>
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">지역군 구성 행정동</div>
-      <table id="tbl-axis-regions"></table>
-    </div>
-  </div>
-  <div class="card p-4 mt-6">
-    <div class="text-sm text-zinc-300 mb-2">대체 관점: 지역군별 민원 토픽 구성 차이</div>
-    <div class="axis-note mb-2">상관이 약할 때는 “수준(level)”보다 “구성(composition)” 차이를 본다는 관점입니다. 값(신축비중-노후비중)이 +면 신축·재정비에서 상대적으로 더 비중이 큽니다.</div>
-    <div id="chart-axis-topic-diff" style="height:340px"></div>
-  </div>
-  <div class="card p-4 mt-6">
-    <div class="text-sm text-zinc-300 mb-2">신축/노후 축 정의 근거 (첨부 파일 반영)</div>
-    <div class="axis-note mb-2">축 정의는 첨부된 standalone 결과의 핵심 라벨(유입 핫스팟/유출 핫스팟)을 기준으로 현재 민원 분석에 매핑했습니다.</div>
-    <table id="tbl-axis-context"></table>
-  </div>
-  <div class="card p-4 mt-6">
-    <div class="text-sm text-zinc-300 mb-2">해석 결론</div>
-    <div id="chapter4-conclusion" class="text-sm leading-7 text-zinc-300"></div>
-  </div>
-  <div class="grid lg:grid-cols-3 gap-6 mt-6">
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">핵심 변수 연관검정</div>
-      <table id="tbl-tests"></table>
-    </div>
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">민감도 분석</div>
-      <table id="tbl-sens"></table>
-    </div>
-    <div class="card p-4">
-      <div class="text-sm text-zinc-300 mb-2">지표 정의</div>
-      <table id="tbl-vars"></table>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section id="ch-claim" class="max-w-7xl mx-auto px-6 py-12">
-  <div class="section-num mb-2">CHAPTER 04 · CLAIM CHAIN</div>
-  <h2 class="text-3xl font-bold mb-2">결론 도출 과정 (Claim → Data → Method → Number → Limitation)</h2>
-  <div class="card p-4 mb-6">
-    <div id="claim-bridge" class="axis-note"></div>
-  </div>
-  <div class="card p-4">
-    <div class="text-sm text-zinc-300 mb-2">주장 근거 체인</div>
-    <table id="tbl-claim-chain"></table>
-  </div>
-  <div class="card p-4 mt-6">
-    <div class="text-sm text-zinc-300 mb-2">과장 방지 해석 규칙</div>
-    <div id="claim-guardrail" class="axis-note"></div>
-  </div>
-</section>
+  <script>
+    const D = window.SN_DATA || {};
+    const fmt = n => (n == null || Number.isNaN(Number(n)) ? '—' : Number(n).toLocaleString('ko-KR'));
+    const pct = n => (n == null || Number.isNaN(Number(n)) ? '—' : (Number(n) >= 0 ? '+' : '') + Number(n).toFixed(2) + '%');
+    const n2 = n => (n == null || Number.isNaN(Number(n)) ? '—' : Number(n).toFixed(2));
+    function tableHtml(headers, rows) {
+      return '<thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>' +
+        rows.map(r => '<tr>' + r.map(v => `<td>${v}</td>`).join('') + '</tr>').join('') + '</tbody>';
+    }
 
-<script>
-const D = window.SN_DATA || {};
-const fmt = n => (n==null||Number.isNaN(Number(n))?'—':Number(n).toLocaleString('ko-KR'));
-const pct = n => (n==null||Number.isNaN(Number(n))?'—':(Number(n)>=0?'+':'') + Number(n).toFixed(2) + '%');
-const n2 = n => (n==null||Number.isNaN(Number(n))?'—':Number(n).toFixed(2));
-function tableHtml(headers, rows){
-  return '<thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'+
-    rows.map(r=>'<tr>'+r.map(v=>`<td>${v}</td>`).join('')+'</tr>').join('')+'</tbody>';
-}
+    const byRate = [...(D.dong || [])].sort((a, b) => a['청년_순유출률'] - b['청년_순유출률']);
+    const sectionOrder = ['ch-intro', 'ch1', 'ch2', 'ch4', 'ch-claim', 'ch0'];
+    sectionOrder.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) document.body.appendChild(el);
+    });
 
-const byRate = [...(D.dong||[])].sort((a,b)=>a['청년_순유출률']-b['청년_순유출률']);
-const sectionOrder = ['ch-intro','ch1','ch2','ch4','ch-claim','ch0'];
-sectionOrder.forEach(id => {
-  const el = document.getElementById(id);
-  if (el) document.body.appendChild(el);
-});
+    const methodTrace = [
+      ['CH1 WHAT', '동별 청년 순유출 hotspot 식별', 'youth_migration + youth_population + geojson', '(전출-전입)/청년인구*100 + 폴리곤 결합', '순유출 고위험 동을 1차 선별'],
+      ['CH2 WHERE', '성남 내부 재배치 경로 식별', 'od_youth_intra_seongnam_dong', '동 OD -> 생활권 행렬 + 상위 경로 추출', '내부 이동 집중 통로 파악'],
+      ['CH3 MAIN EVIDENCE', '개입등급 + 신축/노후 지역군 비교', 'priority + policy_newold_axis/group/topic + axis_*', '플래그 규칙/점수화 + 축 그룹 집계 + 토픽/목적지 구성 비교', '정책 우선순위와 지역군별 구조 차이 해석'],
+      ['CH4 CLAIM CHAIN', '주장-근거 연결 검증', 'claim_chain_*.csv/json', '주장→데이터→처리식→수치→한계 표준화', '논리적 비약/과장 해석 방지'],
+    ];
+    document.getElementById('tbl-method-trace').innerHTML = tableHtml(
+      ['분석', '무엇을 분석', '어떤 데이터', '어떻게 처리', '결과 의미'],
+      methodTrace
+    );
 
-const methodTrace = [
-  ['CH1 WHAT', '동별 청년 순유출 hotspot 식별', 'youth_migration + youth_population + geojson', '(전출-전입)/청년인구*100 + 폴리곤 결합', '순유출 고위험 동을 1차 선별'],
-  ['CH2 WHERE', '성남 내부 재배치 경로 식별', 'od_youth_intra_seongnam_dong', '동 OD -> 생활권 행렬 + 상위 경로 추출', '내부 이동 집중 통로 파악'],
-  ['CH3 MAIN EVIDENCE', '개입등급 + 신축/노후 지역군 비교', 'priority + policy_newold_axis/group/topic + axis_*', '플래그 규칙/점수화 + 축 그룹 집계 + 토픽/목적지 구성 비교', '정책 우선순위와 지역군별 구조 차이 해석'],
-  ['CH4 CLAIM CHAIN', '주장-근거 연결 검증', 'claim_chain_*.csv/json', '주장→데이터→처리식→수치→한계 표준화', '논리적 비약/과장 해석 방지'],
-];
-document.getElementById('tbl-method-trace').innerHTML = tableHtml(
-  ['분석', '무엇을 분석', '어떤 데이터', '어떻게 처리', '결과 의미'],
-  methodTrace
-);
-
-// CH1 map
-const map = L.map('map', { zoomControl: true, attributionControl: false }).setView([37.42, 127.13], 12);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {subdomains:'abcd', maxZoom:19}).addTo(map);
-const rates = (D.geo?.features||[]).map(f=>f.properties.rate).filter(v=>v!=null);
-const vmax = Math.max(...rates.map(v=>Math.abs(v)), 1);
-const colorFor = v => {
-  if(v==null) return '#444';
-  const t=Math.max(-1,Math.min(1,v/vmax));
-  if(t>0){const a=t; return `rgb(${Math.round(127*a + 22*(1-a))},${Math.round(29*a + 24*(1-a))},${Math.round(29*a + 36*(1-a))})`;}
-  const a=-t; return `rgb(${Math.round(30*a + 22*(1-a))},${Math.round(58*a + 24*(1-a))},${Math.round(138*a + 36*(1-a))})`;
-};
-let lockedDong=null;
-const layer = L.geoJSON(D.geo, {
-  style:f=>({color:'#0a0a0f',weight:0.8,fillColor:colorFor(f.properties.rate),fillOpacity:0.92}),
-  onEachFeature:(f,l)=>{
-    l.bindTooltip(`<b>${f.properties.dong}</b> (${f.properties.sgg_full||''})<br>순유출률: <b>${pct(f.properties.rate)}</b><br>청년 인구: ${fmt(f.properties.youth_pop)}명`,{sticky:true});
-    l.on('mouseover',e=>{ if(!lockedDong) showDong(f.properties); e.target.setStyle({weight:2.5,color:'#facc15'});});
-    l.on('mouseout',e=>{ if(!lockedDong) e.target.setStyle({weight:0.8,color:'#0a0a0f'});});
-    l.on('click',()=>{ lockedDong=(lockedDong===f.properties.dong)?null:f.properties.dong; showDong(f.properties); });
-  }
-}).addTo(map);
-map.fitBounds(layer.getBounds(), {padding:[10,10]});
-
-function showDong(p){
-  document.getElementById('dong-name').textContent = p.dong + (lockedDong===p.dong?' (고정)':'');
-  document.getElementById('dong-sgg').textContent = p.sgg_full || '';
-  const rateEl = document.getElementById('dong-rate');
-  rateEl.textContent = pct(p.rate);
-  rateEl.className = 'text-6xl font-black mb-6 ' + ((p.rate||0)>0 ? 'text-orange-400' : 'text-sky-400');
-  document.getElementById('dong-in').textContent = fmt(p.youth_in);
-  document.getElementById('dong-out').textContent = fmt(p.youth_out);
-  document.getElementById('dong-pop').textContent = fmt(p.youth_pop);
-
-  const intraTop = (D.od_intra||[])
-    .filter(o=>o.origin_dong===p.dong)
-    .sort((a,b)=>b.n-a.n)
-    .slice(0,5);
-  document.getElementById('dong-top-dest').innerHTML = intraTop.length===0
-    ? '<li class="text-zinc-600">데이터 없음</li>'
-    : intraTop.map(o=>`<li class="flex justify-between"><span>${o.dest_dong}</span><span class="text-zinc-500">${fmt(o.n)}명</span></li>`).join('');
-}
-
-// CH2 heatmap
-const m = D.od_intra_matrix || [];
-const oLabels = [...new Set(m.map(r=>r.origin_cluster))];
-const dLabels = [...new Set(m.map(r=>r.dest_cluster))];
-const z = oLabels.map(o => dLabels.map(d => {
-  const r = m.find(x => x.origin_cluster===o && x.dest_cluster===d);
-  return r ? Number(r.n) : 0;
-}));
-Plotly.newPlot('heat-intra', [{
-  type:'heatmap',
-  x:dLabels, y:oLabels, z,
-  colorscale:'YlOrRd',
-  hovertemplate:'출발 %{y}<br>도착 %{x}<br>이동 %{z}명<extra></extra>'
-}], {
-  paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-  font:{family:'Pretendard',color:'#f4f4f8',size:10},
-  xaxis:{tickangle:-30}, yaxis:{autorange:'reversed'},
-  margin:{l:90,r:12,t:12,b:80}
-},{displayModeBar:false});
-
-const pairs = (D.od_intra_pairs||[]).slice(0,10);
-const totalIntra = (D.od_intra||[]).reduce((acc,row)=>acc + Number(row.n||0), 0);
-document.getElementById('tbl-pairs').innerHTML = tableHtml(
-  ['순위','출발','도착','이동(명)','내부이동 비중(%)'],
-  pairs.map((r,i)=>[
-    i+1,
-    r.origin_cluster,
-    r.dest_cluster,
-    fmt(r.n),
-    totalIntra>0 ? n2(Number(r.n)/totalIntra*100) : '—'
-  ])
-);
-const top3Pairs = pairs.slice(0,3).map(r=>`${r.origin_cluster}→${r.dest_cluster}`).join(', ');
-let topIn = '';
-let topOut = '';
-if (m.length){
-  const inTotals = {};
-  const outTotals = {};
-  m.forEach(r=>{
-    const o = String(r.origin_cluster||'');
-    const d = String(r.dest_cluster||'');
-    const n = Number(r.n||0);
-    outTotals[o] = (outTotals[o]||0) + n;
-    inTotals[d] = (inTotals[d]||0) + n;
-  });
-  topIn = Object.entries(inTotals).sort((a,b)=>b[1]-a[1])[0]?.[0] || '';
-  topOut = Object.entries(outTotals).sort((a,b)=>b[1]-a[1])[0]?.[0] || '';
-}
-document.getElementById('chapter2-heat-interpret').innerHTML =
-  topIn && topOut
-    ? `히트맵에서 가장 진한 셀은 내부 재배치가 집중된 통로를 의미합니다. 현재는 <b>${topOut}</b> 출발과 <b>${topIn}</b> 도착 축의 이동량이 크며, 이는 생활권 간 이동 압력이 특정 축으로 수렴함을 보여줍니다.`
-    : '히트맵 해석을 위한 충분한 이동량 데이터가 없습니다.';
-document.getElementById('chapter2-meaning').innerHTML =
-  top3Pairs
-    ? `상위 이동쌍은 단순 순위가 아니라, 청년 재배치가 실제로 집중되는 “핵심 이동 통로”입니다. TOP3(<b>${top3Pairs}</b>)는 개입 우선 생활권과 연결해 원인-결과 경로를 설명하는 근거가 됩니다.`
-    : '현재 월의 유의미한 상위 이동쌍이 충분하지 않습니다.';
-
-// CH4 evidence
-const c = D.criteria || {};
-const th = c.thresholds || {};
-document.getElementById('tbl-criteria').innerHTML = tableHtml(
-  ['항목','기준값'],
-  [
-    ['고유출 플래그', `유출률 >= ${n2(th.youth_outflow_rate_q70)}% (70분위)`],
-    ['지속유출 플래그', `순유출 월비중 >= ${n2((th.negative_month_share_q70||0)*100)}% (70분위)`],
-    ['고민원 플래그', `민원강도 >= ${n2(th.complaints_per_1000_totalpop_q60)} (60분위)`],
-    ['A/B/C/D 규칙', '플래그 3/2/1/0개 충족']
-  ]
-);
-
-const pri = (D.priority||[]).filter(r=>['A_즉시개입','B_우선개입'].includes(r.policy_tier)).slice(0,15);
-document.getElementById('tbl-priority').innerHTML = tableHtml(
-  ['생활권','등급','근거','유출률(%)','순유출월비중'],
-  pri.map(r=>[r.dong_cluster, r.policy_tier, r.tier_reason, n2(r.youth_outflow_rate), n2(Number(r.negative_month_share)*100)+'%'])
-);
-
-const allPri = D.priority || [];
-const tierOrder = ['A_즉시개입','B_우선개입','C_모니터링','D_유지'];
-const tierColor = {'A_즉시개입':'#f97316','B_우선개입':'#f59e0b','C_모니터링':'#38bdf8','D_유지':'#64748b'};
-const tierCounts = tierOrder.map(t => allPri.filter(r=>r.policy_tier===t).length);
-const abTargets = allPri.filter(r=>['A_즉시개입','B_우선개입'].includes(r.policy_tier)).map(r=>String(r.dong_cluster||''));
-const abPreview = abTargets.slice(0,8).join(', ');
-document.getElementById('intro-conclusion').innerHTML =
-  `이번 분석의 주근거는 <b>신축·재정비 vs 노후·정체 지역군 비교</b>입니다. ` +
-  `민원강도-순유출률 월별 상관은 보조 검증으로 축소하고, 정책판단은 지역군 구조 차이와 개입등급으로 수행합니다.`;
-document.getElementById('intro-priority').innerHTML =
-  abTargets.length
-    ? `<b>${abTargets.length}개</b> 생활권이 A/B에 해당합니다. ${abPreview}${abTargets.length>8?' ...':''}`
-    : '현재 A/B 우선개입 대상이 식별되지 않았습니다.';
-Plotly.newPlot('chart-tier-bar', [{
-  type:'bar',
-  x:tierOrder, y:tierCounts,
-  marker:{color:tierOrder.map(t=>tierColor[t])},
-  text:tierCounts.map(v=>String(v)), textposition:'outside',
-  hovertemplate:'%{x}<br>%{y}개 생활권<extra></extra>'
-}], {
-  paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-  font:{family:'Pretendard',color:'#f4f4f8',size:10},
-  xaxis:{gridcolor:'#252837'}, yaxis:{title:'생활권 수',gridcolor:'#252837',dtick:1},
-  margin:{l:55,r:10,t:20,b:40}
-},{displayModeBar:false});
-
-Plotly.newPlot('chart-tier-risk', tierOrder.map(t=>{
-  const s = allPri.filter(r=>r.policy_tier===t);
-  return {
-    type:'scatter', mode:'markers', name:t,
-    x:s.map(r=>Number(r.youth_outflow_rate)),
-    y:s.map(r=>Number(r.negative_month_share)*100),
-    text:s.map(r=>r.dong_cluster),
-    marker:{color:tierColor[t], size:s.map(r=>Math.max(9, Number(r.complaints_per_1000_totalpop)*1.5)), line:{width:1,color:'#0a0a0f'}},
-    hovertemplate:'%{text}<br>유출률 %{x:.2f}%<br>순유출월비중 %{y:.1f}%<extra></extra>'
-  };
-}), {
-  paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-  font:{family:'Pretendard',color:'#f4f4f8',size:10},
-  xaxis:{title:'청년 순유출률(%)',gridcolor:'#252837'},
-  yaxis:{title:'순유출 월 비중(%)',gridcolor:'#252837'},
-  margin:{l:60,r:10,t:10,b:50},
-  shapes:[
-    {type:'line',x0:Number(th.youth_outflow_rate_q70||0),x1:Number(th.youth_outflow_rate_q70||0),y0:0,y1:1,yref:'paper',line:{color:'#f59e0b',dash:'dot',width:1}},
-    {type:'line',x0:0,x1:1,xref:'paper',y0:Number(th.negative_month_share_q70||0)*100,y1:Number(th.negative_month_share_q70||0)*100,line:{color:'#f59e0b',dash:'dot',width:1}}
-  ],
-  legend:{orientation:'h',y:-0.2}
-},{displayModeBar:false});
-
-const axisOrder = ['신축·재정비', '노후·정체', '혼합/전이'];
-const axisColor = {'신축·재정비':'#38bdf8','노후·정체':'#f97316','혼합/전이':'#94a3b8'};
-const axisRows = (D.axis_findings || []).slice();
-const axisSummary = (D.axis_summary || []).slice();
-const axisChartTraces = axisOrder.map(label => {
-  const vals = axisRows
-    .filter(r => String(r.axis_type) === label)
-    .map(r => Number(r.complaints_per_1000_totalpop))
-    .filter(v => Number.isFinite(v));
-  return {
-    type:'box',
-    name:label,
-    y:vals,
-    boxpoints:'all',
-    jitter:0.35,
-    pointpos:0,
-    marker:{size:6,color:axisColor[label] || '#94a3b8',opacity:0.75},
-    line:{color:axisColor[label] || '#94a3b8'},
-    hovertemplate:`${label}<br>민원강도 %{y:.2f}<extra></extra>`
-  };
-}).filter(t => t.y.length > 0);
-if (axisChartTraces.length){
-  Plotly.newPlot('chart-axis-complaint', axisChartTraces, {
-    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-    font:{family:'Pretendard',color:'#f4f4f8',size:10},
-    xaxis:{gridcolor:'#252837'},
-    yaxis:{title:'민원강도(총인구 1천명당)',gridcolor:'#252837'},
-    margin:{l:60,r:10,t:10,b:70},
-    showlegend:false
-  }, {displayModeBar:false});
-}
-document.getElementById('tbl-axis-findings').innerHTML = tableHtml(
-  ['축 그룹','생활권 수','평균 민원강도','평균 유출률(%)','A/B 비중(%)'],
-  axisSummary.map(r=>[
-    String(r.axis_type || '-'),
-    fmt(r.cluster_count),
-    n2(r.mean_complaints_per_1000),
-    n2(r.mean_outflow_rate),
-    n2(r.ab_tier_share_pct)
-  ])
-);
-document.getElementById('tbl-axis-regions').innerHTML = tableHtml(
-  ['지역군', '포함 생활권(행정동 클러스터)'],
-  axisOrder.map(label => {
-    const members = [...new Set(axisRows.filter(r=>String(r.axis_type)===label).map(r=>String(r.dong_cluster||'')))]
-      .filter(Boolean)
-      .sort((a,b)=>a.localeCompare(b,'ko'));
-    return [label, members.length ? members.join(', ') : '—'];
-  })
-);
-
-const destLabel = {
-  seoul_gangnam3: '서울 강남3구',
-  seoul_other: '서울 기타',
-  gyeonggi_near_core: '경기 인접핵심',
-  gyeonggi_other: '경기 기타',
-  outside_capital_region: '수도권 외'
-};
-const axisDestMix = (D.axis_dest_mix || []).slice();
-const axisDestConc = (D.axis_dest_conc || []).slice();
-const destBuckets = [...new Set(axisDestMix.map(r=>String(r.destination_bucket||'')))].filter(Boolean);
-if (axisDestMix.length && destBuckets.length){
-  const visibleGroups = ['신축·재정비', '노후·정체', '혼합/전이'];
-  const traces = visibleGroups.map(g => {
-    const sub = axisDestMix.filter(r=>String(r.axis_group_label||'')===g);
-    return {
-      type:'bar',
-      name:g,
-      x:destBuckets.map(b=>destLabel[b] || b),
-      y:destBuckets.map(b=>{
-        const row = sub.find(r=>String(r.destination_bucket||'')===b);
-        return row ? Number(row.bucket_share)*100 : 0;
-      }),
-      hovertemplate:'%{x}<br>%{y:.2f}%<extra>'+g+'</extra>'
+    // CH1 map
+    const map = L.map('map', { zoomControl: true, attributionControl: false }).setView([37.42, 127.13], 12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+    const rates = (D.geo?.features || []).map(f => f.properties.rate).filter(v => v != null);
+    const vmax = Math.max(...rates.map(v => Math.abs(v)), 1);
+    const colorFor = v => {
+      if (v == null) return '#444';
+      const t = Math.max(-1, Math.min(1, v / vmax));
+      if (t > 0) { const a = t; return `rgb(${Math.round(127 * a + 22 * (1 - a))},${Math.round(29 * a + 24 * (1 - a))},${Math.round(29 * a + 36 * (1 - a))})`; }
+      const a = -t; return `rgb(${Math.round(30 * a + 22 * (1 - a))},${Math.round(58 * a + 24 * (1 - a))},${Math.round(138 * a + 36 * (1 - a))})`;
     };
-  }).filter(t=>t.y.some(v=>v>0));
-  Plotly.newPlot('chart-axis-dest-mix', traces, {
-    barmode:'group',
-    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-    font:{family:'Pretendard',color:'#f4f4f8',size:10},
-    xaxis:{gridcolor:'#252837'},
-    yaxis:{title:'유출 비중(%)',gridcolor:'#252837'},
-    margin:{l:60,r:10,t:10,b:60},
-    legend:{orientation:'h',y:1.1}
-  },{displayModeBar:false});
-}
-document.getElementById('tbl-axis-dest-concentration').innerHTML = tableHtml(
-  ['지역군','주요 목적지','주요 목적지 비중(%)','편중도(HHI)'],
-  axisDestConc
-    .slice()
-    .sort((a,b)=>Number(a.axis_group_order||99)-Number(b.axis_group_order||99))
-    .map(r=>[
-      String(r.axis_group_label || r.axis_group || '-'),
-      destLabel[String(r.top_category||'')] || String(r.top_category||'-'),
-      n2(Number(r.top_share||0)*100),
-      n2(r.hhi)
-    ])
-);
+    let lockedDong = null;
+    const layer = L.geoJSON(D.geo, {
+      style: f => ({ color: '#0a0a0f', weight: 0.8, fillColor: colorFor(f.properties.rate), fillOpacity: 0.92 }),
+      onEachFeature: (f, l) => {
+        l.bindTooltip(`<b>${f.properties.dong}</b> (${f.properties.sgg_full || ''})<br>순유출률: <b>${pct(f.properties.rate)}</b><br>청년 인구: ${fmt(f.properties.youth_pop)}명`, { sticky: true });
+        l.on('mouseover', e => { if (!lockedDong) showDong(f.properties); e.target.setStyle({ weight: 2.5, color: '#facc15' }); });
+        l.on('mouseout', e => { if (!lockedDong) e.target.setStyle({ weight: 0.8, color: '#0a0a0f' }); });
+        l.on('click', () => { lockedDong = (lockedDong === f.properties.dong) ? null : f.properties.dong; showDong(f.properties); });
+      }
+    }).addTo(map);
+    map.fitBounds(layer.getBounds(), { padding: [10, 10] });
 
-const topicComp = (D.policy_newold_topic_comp || []).slice();
-const topicDiff = topicComp
-  .filter(r=>Number.isFinite(Number(r.share_diff_new_minus_old)))
-  .sort((a,b)=>Math.abs(Number(b.share_diff_new_minus_old))-Math.abs(Number(a.share_diff_new_minus_old)))
-  .slice(0,8);
-if (topicDiff.length){
-  Plotly.newPlot('chart-axis-topic-diff', [{
-    type:'bar',
-    orientation:'h',
-    y:topicDiff.map(r=>String(r.topic_group)),
-    x:topicDiff.map(r=>Number(r.share_diff_new_minus_old)*100),
-    marker:{color:topicDiff.map(r=>Number(r.share_diff_new_minus_old)>=0 ? '#38bdf8' : '#f97316')},
-    customdata:topicDiff.map(r=>[r.new_redevelopment_topic_share, r.old_stagnant_topic_share]),
-    hovertemplate:'%{y}<br>신축-노후 비중차: %{x:.2f}%p<br>신축비중: %{customdata[0]:.3f}<br>노후비중: %{customdata[1]:.3f}<extra></extra>'
-  }],{
-    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-    font:{family:'Pretendard',color:'#f4f4f8',size:10},
-    xaxis:{title:'비중차 (신축·재정비 - 노후·정체, %p)',gridcolor:'#252837'},
-    yaxis:{autorange:'reversed',gridcolor:'#252837'},
-    margin:{l:110,r:20,t:10,b:50}
-  },{displayModeBar:false});
-}
-const axisContext = D.axis_context_evidence || [];
-document.getElementById('tbl-axis-context').innerHTML = tableHtml(
-  ['출처', '근거 라벨', '근거 문구', '분석 매핑 축'],
-  axisContext.map(r=>[
-    String(r.source || '-'),
-    String(r.evidence_label || '-'),
-    String(r.evidence_text || '-'),
-    String(r.mapped_axis || '-')
-  ])
-);
+    function showDong(p) {
+      document.getElementById('dong-name').textContent = p.dong + (lockedDong === p.dong ? ' (고정)' : '');
+      document.getElementById('dong-sgg').textContent = p.sgg_full || '';
+      const rateEl = document.getElementById('dong-rate');
+      rateEl.textContent = pct(p.rate);
+      rateEl.className = 'text-6xl font-black mb-6 ' + ((p.rate || 0) > 0 ? 'text-orange-400' : 'text-sky-400');
+      document.getElementById('dong-in').textContent = fmt(p.youth_in);
+      document.getElementById('dong-out').textContent = fmt(p.youth_out);
+      document.getElementById('dong-pop').textContent = fmt(p.youth_pop);
 
-const topA = allPri.filter(r=>r.policy_tier==='A_즉시개입').slice(0,5).map(r=>r.dong_cluster);
-const strongest = (D.policy_relations||[])[0];
-document.getElementById('chapter4-conclusion').innerHTML = [
-  `개입 등급 분포는 <b>A ${tierCounts[0]}개, B ${tierCounts[1]}개, C ${tierCounts[2]}개, D ${tierCounts[3]}개</b>입니다.`,
-  `신축·재정비/노후·정체는 개별 동이 아니라, 동을 묶은 <b>지역군 분류</b>입니다.`,
-  axisSummary.length ? `축 비교에서 민원강도 평균이 가장 높은 그룹은 <b>${axisSummary.slice().sort((a,b)=>Number(b.mean_complaints_per_1000)-Number(a.mean_complaints_per_1000))[0].axis_type}</b>입니다.` : '',
-  topA.length ? `즉시개입(A) 우선 생활권은 <b>${topA.join(', ')}</b>입니다.` : '즉시개입(A) 생활권은 없습니다.',
-  strongest ? `정책지표 중 유출률과 가장 강한 연관은 <b>${strongest.x_variable}</b> (Spearman r=${n2(strongest.spearman_r)}, p=${n2(strongest.spearman_p)})입니다.` : ''
-].filter(Boolean).join('<br>');
+      const intraTop = (D.od_intra || [])
+        .filter(o => o.origin_dong === p.dong)
+        .sort((a, b) => b.n - a.n)
+        .slice(0, 5);
+      document.getElementById('dong-top-dest').innerHTML = intraTop.length === 0
+        ? '<li class="text-zinc-600">데이터 없음</li>'
+        : intraTop.map(o => `<li class="flex justify-between"><span>${o.dest_dong}</span><span class="text-zinc-500">${fmt(o.n)}명</span></li>`).join('');
+    }
 
-const claimRowsRaw = (D.claim_chain_rows || []).slice();
-const claimRows = claimRowsRaw.map(r => ({
-  claim: String(r.claim ?? r.주장 ?? '-'),
-  data_used: String(r.data_used ?? r.data ?? r.데이터 ?? '-'),
-  processing_expr: String(r.processing_expr ?? r.processing ?? r.처리식 ?? '-'),
-  result_value: String(r.result_value ?? r.result ?? r.결과수치 ?? '-'),
-  limitation: String(r.limitation ?? r.한계 ?? '-'),
-}));
-const claimSources = (D.claim_chain_sources || []).filter(Boolean);
-document.getElementById('claim-bridge').innerHTML =
-  'CH3에서 제시한 지역군 근거를 그대로 결론으로 점프하지 않기 위해, 아래 Claim Chain에 각 주장별 데이터·처리식·수치·한계를 일렬로 공개합니다. ' +
-  '즉, “무엇을 근거로 어디까지 말할 수 있는지”를 심사자가 바로 추적할 수 있도록 구성했습니다.';
-document.getElementById('tbl-claim-chain').innerHTML = tableHtml(
-  ['주장', '데이터', '처리식', '결과수치', '한계'],
-  claimRows.length
-    ? claimRows.map(r => [r.claim, r.data_used, r.processing_expr, r.result_value, r.limitation])
-    : [[
-      'claim_chain_*.csv 대기',
-      claimSources.length ? claimSources.join(', ') : 'data/processed/claim_chain_*.csv',
-      '-',
-      '-',
-      '현재 입력 파일이 없어 표를 생성하지 못했습니다.'
-    ]]
-);
-document.getElementById('claim-guardrail').innerHTML =
-  '<b>상관≠인과</b>: 본 사이트의 상관/회귀 수치는 정책 우선순위 참고 신호이며 인과효과를 단정하지 않습니다.<br>' +
-  '<b>지역군 수준 해석</b>: 신축·재정비/노후·정체는 개별 동이 아닌 지역군 평균 경향으로, 개별 동 단위 판정에는 추가 검증이 필요합니다.';
+    // CH2 heatmap
+    const m = D.od_intra_matrix || [];
+    const oLabels = [...new Set(m.map(r => r.origin_cluster))];
+    const dLabels = [...new Set(m.map(r => r.dest_cluster))];
+    const z = oLabels.map(o => dLabels.map(d => {
+      const r = m.find(x => x.origin_cluster === o && x.dest_cluster === d);
+      return r ? Number(r.n) : 0;
+    }));
+    Plotly.newPlot('heat-intra', [{
+      type: 'heatmap',
+      x: dLabels, y: oLabels, z,
+      colorscale: 'YlOrRd',
+      hovertemplate: '출발 %{y}<br>도착 %{x}<br>이동 %{z}명<extra></extra>'
+    }], {
+      paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+      font: { family: 'Pretendard', color: '#f4f4f8', size: 10 },
+      xaxis: { tickangle: -30 }, yaxis: { autorange: 'reversed' },
+      margin: { l: 90, r: 12, t: 12, b: 80 }
+    }, { displayModeBar: false });
 
-const rel = (D.policy_relations||[]).slice(0,8);
-if (rel.length){
-  document.getElementById('tbl-tests').innerHTML = tableHtml(
-    ['X 변수','Y 변수','Spearman r','p값'],
-    rel.map(r=>[r.x_variable, r.y_variable, n2(r.spearman_r), n2(r.spearman_p)])
-  );
-} else {
-  const tests = (D.tests||[]).slice(0,8);
-  document.getElementById('tbl-tests').innerHTML = tableHtml(
-    ['변수','Spearman r','p값','95% CI'],
-    tests.map(r=>[r.variable, n2(r.spearman_r), n2(r.spearman_p), `${n2(r.spearman_ci_low)} ~ ${n2(r.spearman_ci_high)}`])
-  );
-}
+    const pairs = (D.od_intra_pairs || []).slice(0, 10);
+    const totalIntra = (D.od_intra || []).reduce((acc, row) => acc + Number(row.n || 0), 0);
+    document.getElementById('tbl-pairs').innerHTML = tableHtml(
+      ['순위', '출발', '도착', '이동(명)', '내부이동 비중(%)'],
+      pairs.map((r, i) => [
+        i + 1,
+        r.origin_cluster,
+        r.dest_cluster,
+        fmt(r.n),
+        totalIntra > 0 ? n2(Number(r.n) / totalIntra * 100) : '—'
+      ])
+    );
+    const top3Pairs = pairs.slice(0, 3).map(r => `${r.origin_cluster}→${r.dest_cluster}`).join(', ');
+    let topIn = '';
+    let topOut = '';
+    if (m.length) {
+      const inTotals = {};
+      const outTotals = {};
+      m.forEach(r => {
+        const o = String(r.origin_cluster || '');
+        const d = String(r.dest_cluster || '');
+        const n = Number(r.n || 0);
+        outTotals[o] = (outTotals[o] || 0) + n;
+        inTotals[d] = (inTotals[d] || 0) + n;
+      });
+      topIn = Object.entries(inTotals).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+      topOut = Object.entries(outTotals).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+    }
+    document.getElementById('chapter2-heat-interpret').innerHTML =
+      topIn && topOut
+        ? `히트맵에서 가장 진한 셀은 내부 재배치가 집중된 통로를 의미합니다. 현재는 <b>${topOut}</b> 출발과 <b>${topIn}</b> 도착 축의 이동량이 크며, 이는 생활권 간 이동 압력이 특정 축으로 수렴함을 보여줍니다.`
+        : '히트맵 해석을 위한 충분한 이동량 데이터가 없습니다.';
+    document.getElementById('chapter2-meaning').innerHTML =
+      top3Pairs
+        ? `상위 이동쌍은 단순 순위가 아니라, 청년 재배치가 실제로 집중되는 “핵심 이동 통로”입니다. TOP3(<b>${top3Pairs}</b>)는 개입 우선 생활권과 연결해 원인-결과 경로를 설명하는 근거가 됩니다.`
+        : '현재 월의 유의미한 상위 이동쌍이 충분하지 않습니다.';
 
-const sens = D.sensitivity || [];
-document.getElementById('tbl-sens').innerHTML = tableHtml(
-  ['시나리오','TOP10 중복률','최대','최소'],
-  sens.map(r=>[r.scenario, n2(Number(r.top10_overlap_with_base)*100)+'%', n2(r.max_rate), n2(r.min_rate)])
-);
+    // CH4 evidence
+    const c = D.criteria || {};
+    const th = c.thresholds || {};
+    document.getElementById('tbl-criteria').innerHTML = tableHtml(
+      ['항목', '기준값'],
+      [
+        ['고유출 플래그', `유출률 >= ${n2(th.youth_outflow_rate_q70)}% (70분위)`],
+        ['지속유출 플래그', `순유출 월비중 >= ${n2((th.negative_month_share_q70 || 0) * 100)}% (70분위)`],
+        ['고민원 플래그', `민원강도 >= ${n2(th.complaints_per_1000_totalpop_q60)} (60분위)`],
+        ['A/B/C/D 규칙', '플래그 3/2/1/0개 충족']
+      ]
+    );
 
-const vars = c.variables || {};
-document.getElementById('tbl-vars').innerHTML = tableHtml(
-  ['변수','의미'],
-  Object.entries(vars).map(([k,v])=>[k,v])
-);
+    const pri = (D.priority || []).filter(r => ['A_즉시개입', 'B_우선개입'].includes(r.policy_tier)).slice(0, 15);
+    document.getElementById('tbl-priority').innerHTML = tableHtml(
+      ['생활권', '등급', '근거', '유출률(%)', '순유출월비중'],
+      pri.map(r => [r.dong_cluster, r.policy_tier, r.tier_reason, n2(r.youth_outflow_rate), n2(Number(r.negative_month_share) * 100) + '%'])
+    );
 
-if (byRate.length){
-  const target = byRate[byRate.length-1].dong;
-  const feat = (D.geo?.features||[]).find(f=>f.properties.dong===target);
-  if (feat) showDong(feat.properties);
-}
-</script>
+    const allPri = D.priority || [];
+    const tierOrder = ['A_즉시개입', 'B_우선개입', 'C_모니터링', 'D_유지'];
+    const tierColor = { 'A_즉시개입': '#f97316', 'B_우선개입': '#f59e0b', 'C_모니터링': '#38bdf8', 'D_유지': '#64748b' };
+    const tierCounts = tierOrder.map(t => allPri.filter(r => r.policy_tier === t).length);
+    const abTargets = allPri.filter(r => ['A_즉시개입', 'B_우선개입'].includes(r.policy_tier)).map(r => String(r.dong_cluster || ''));
+    const abPreview = abTargets.slice(0, 8).join(', ');
+    document.getElementById('intro-conclusion').innerHTML =
+      `이번 분석의 주근거는 <b>신축·재정비 vs 노후·정체 지역군 비교</b>입니다. ` +
+      `민원강도-순유출률 월별 상관은 보조 검증으로 축소하고, 정책판단은 지역군 구조 차이와 개입등급으로 수행합니다.`;
+    document.getElementById('intro-priority').innerHTML =
+      abTargets.length
+        ? `<b>${abTargets.length}개</b> 생활권이 A/B에 해당합니다. ${abPreview}${abTargets.length > 8 ? ' ...' : ''}`
+        : '현재 A/B 우선개입 대상이 식별되지 않았습니다.';
+    Plotly.newPlot('chart-tier-bar', [{
+      type: 'bar',
+      x: tierOrder, y: tierCounts,
+      marker: { color: tierOrder.map(t => tierColor[t]) },
+      text: tierCounts.map(v => String(v)), textposition: 'outside',
+      hovertemplate: '%{x}<br>%{y}개 생활권<extra></extra>'
+    }], {
+      paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+      font: { family: 'Pretendard', color: '#f4f4f8', size: 10 },
+      xaxis: { gridcolor: '#252837' }, yaxis: { title: '생활권 수', gridcolor: '#252837', dtick: 1 },
+      margin: { l: 55, r: 10, t: 20, b: 40 }
+    }, { displayModeBar: false });
+
+    Plotly.newPlot('chart-tier-risk', tierOrder.map(t => {
+      const s = allPri.filter(r => r.policy_tier === t);
+      return {
+        type: 'scatter', mode: 'markers', name: t,
+        x: s.map(r => Number(r.youth_outflow_rate)),
+        y: s.map(r => Number(r.negative_month_share) * 100),
+        text: s.map(r => r.dong_cluster),
+        marker: { color: tierColor[t], size: s.map(r => Math.max(9, Number(r.complaints_per_1000_totalpop) * 1.5)), line: { width: 1, color: '#0a0a0f' } },
+        hovertemplate: '%{text}<br>유출률 %{x:.2f}%<br>순유출월비중 %{y:.1f}%<extra></extra>'
+      };
+    }), {
+      paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+      font: { family: 'Pretendard', color: '#f4f4f8', size: 10 },
+      xaxis: { title: '청년 순유출률(%)', gridcolor: '#252837' },
+      yaxis: { title: '순유출 월 비중(%)', gridcolor: '#252837' },
+      margin: { l: 60, r: 10, t: 10, b: 50 },
+      shapes: [
+        { type: 'line', x0: Number(th.youth_outflow_rate_q70 || 0), x1: Number(th.youth_outflow_rate_q70 || 0), y0: 0, y1: 1, yref: 'paper', line: { color: '#f59e0b', dash: 'dot', width: 1 } },
+        { type: 'line', x0: 0, x1: 1, xref: 'paper', y0: Number(th.negative_month_share_q70 || 0) * 100, y1: Number(th.negative_month_share_q70 || 0) * 100, line: { color: '#f59e0b', dash: 'dot', width: 1 } }
+      ],
+      legend: { orientation: 'h', y: -0.2 }
+    }, { displayModeBar: false });
+
+    const axisOrder = ['신축·재정비', '노후·정체', '혼합/전이'];
+    const axisColor = { '신축·재정비': '#38bdf8', '노후·정체': '#f97316', '혼합/전이': '#94a3b8' };
+    const axisRows = (D.axis_findings || []).slice();
+    const axisSummary = (D.axis_summary || []).slice();
+    const axisChartTraces = axisOrder.map(label => {
+      const vals = axisRows
+        .filter(r => String(r.axis_type) === label)
+        .map(r => Number(r.complaints_per_1000_totalpop))
+        .filter(v => Number.isFinite(v));
+      return {
+        type: 'box',
+        name: label,
+        y: vals,
+        boxpoints: 'all',
+        jitter: 0.35,
+        pointpos: 0,
+        marker: { size: 6, color: axisColor[label] || '#94a3b8', opacity: 0.75 },
+        line: { color: axisColor[label] || '#94a3b8' },
+        hovertemplate: `${label}<br>민원강도 %{y:.2f}<extra></extra>`
+      };
+    }).filter(t => t.y.length > 0);
+    if (axisChartTraces.length) {
+      Plotly.newPlot('chart-axis-complaint', axisChartTraces, {
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { family: 'Pretendard', color: '#f4f4f8', size: 10 },
+        xaxis: { gridcolor: '#252837' },
+        yaxis: { title: '민원강도(총인구 1천명당)', gridcolor: '#252837' },
+        margin: { l: 60, r: 10, t: 10, b: 70 },
+        showlegend: false
+      }, { displayModeBar: false });
+    }
+    document.getElementById('tbl-axis-findings').innerHTML = tableHtml(
+      ['축 그룹', '생활권 수', '평균 민원강도', '평균 유출률(%)', 'A/B 비중(%)'],
+      axisSummary.map(r => [
+        String(r.axis_type || '-'),
+        fmt(r.cluster_count),
+        n2(r.mean_complaints_per_1000),
+        n2(r.mean_outflow_rate),
+        n2(r.ab_tier_share_pct)
+      ])
+    );
+    document.getElementById('tbl-axis-regions').innerHTML = tableHtml(
+      ['지역군', '포함 생활권(행정동 클러스터)'],
+      axisOrder.map(label => {
+        const members = [...new Set(axisRows.filter(r => String(r.axis_type) === label).map(r => String(r.dong_cluster || '')))]
+          .filter(Boolean)
+          .sort((a, b) => a.localeCompare(b, 'ko'));
+        return [label, members.length ? members.join(', ') : '—'];
+      })
+    );
+
+    const destLabel = {
+      seoul_gangnam3: '서울 강남3구',
+      seoul_other: '서울 기타',
+      gyeonggi_near_core: '경기 인접핵심',
+      gyeonggi_other: '경기 기타',
+      outside_capital_region: '수도권 외'
+    };
+    const axisDestMix = (D.axis_dest_mix || []).slice();
+    const axisDestConc = (D.axis_dest_conc || []).slice();
+    const destBuckets = [...new Set(axisDestMix.map(r => String(r.destination_bucket || '')))].filter(Boolean);
+    if (axisDestMix.length && destBuckets.length) {
+      const visibleGroups = ['신축·재정비', '노후·정체', '혼합/전이'];
+      const traces = visibleGroups.map(g => {
+        const sub = axisDestMix.filter(r => String(r.axis_group_label || '') === g);
+        return {
+          type: 'bar',
+          name: g,
+          x: destBuckets.map(b => destLabel[b] || b),
+          y: destBuckets.map(b => {
+            const row = sub.find(r => String(r.destination_bucket || '') === b);
+            return row ? Number(row.bucket_share) * 100 : 0;
+          }),
+          hovertemplate: '%{x}<br>%{y:.2f}%<extra>' + g + '</extra>'
+        };
+      }).filter(t => t.y.some(v => v > 0));
+      Plotly.newPlot('chart-axis-dest-mix', traces, {
+        barmode: 'group',
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { family: 'Pretendard', color: '#f4f4f8', size: 10 },
+        xaxis: { gridcolor: '#252837' },
+        yaxis: { title: '유출 비중(%)', gridcolor: '#252837' },
+        margin: { l: 60, r: 10, t: 10, b: 60 },
+        legend: { orientation: 'h', y: 1.1 }
+      }, { displayModeBar: false });
+    }
+    document.getElementById('tbl-axis-dest-concentration').innerHTML = tableHtml(
+      ['지역군', '주요 목적지', '주요 목적지 비중(%)', '편중도(HHI)'],
+      axisDestConc
+        .slice()
+        .sort((a, b) => Number(a.axis_group_order || 99) - Number(b.axis_group_order || 99))
+        .map(r => [
+          String(r.axis_group_label || r.axis_group || '-'),
+          destLabel[String(r.top_category || '')] || String(r.top_category || '-'),
+          n2(Number(r.top_share || 0) * 100),
+          n2(r.hhi)
+        ])
+    );
+
+    const topicComp = (D.policy_newold_topic_comp || []).slice();
+    const topicDiff = topicComp
+      .filter(r => Number.isFinite(Number(r.share_diff_new_minus_old)))
+      .sort((a, b) => Math.abs(Number(b.share_diff_new_minus_old)) - Math.abs(Number(a.share_diff_new_minus_old)))
+      .slice(0, 8);
+    if (topicDiff.length) {
+      Plotly.newPlot('chart-axis-topic-diff', [{
+        type: 'bar',
+        orientation: 'h',
+        y: topicDiff.map(r => String(r.topic_group)),
+        x: topicDiff.map(r => Number(r.share_diff_new_minus_old) * 100),
+        marker: { color: topicDiff.map(r => Number(r.share_diff_new_minus_old) >= 0 ? '#38bdf8' : '#f97316') },
+        customdata: topicDiff.map(r => [r.new_redevelopment_topic_share, r.old_stagnant_topic_share]),
+        hovertemplate: '%{y}<br>신축-노후 비중차: %{x:.2f}%p<br>신축비중: %{customdata[0]:.3f}<br>노후비중: %{customdata[1]:.3f}<extra></extra>'
+      }], {
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { family: 'Pretendard', color: '#f4f4f8', size: 10 },
+        xaxis: { title: '비중차 (신축·재정비 - 노후·정체, %p)', gridcolor: '#252837' },
+        yaxis: { autorange: 'reversed', gridcolor: '#252837' },
+        margin: { l: 110, r: 20, t: 10, b: 50 }
+      }, { displayModeBar: false });
+    }
+    const axisContext = D.axis_context_evidence || [];
+    document.getElementById('tbl-axis-context').innerHTML = tableHtml(
+      ['출처', '근거 라벨', '근거 문구', '분석 매핑 축'],
+      axisContext.map(r => [
+        String(r.source || '-'),
+        String(r.evidence_label || '-'),
+        String(r.evidence_text || '-'),
+        String(r.mapped_axis || '-')
+      ])
+    );
+
+    const topA = allPri.filter(r => r.policy_tier === 'A_즉시개입').slice(0, 5).map(r => r.dong_cluster);
+    const strongest = (D.policy_relations || [])[0];
+    document.getElementById('chapter4-conclusion').innerHTML = [
+      `개입 등급 분포는 <b>A ${tierCounts[0]}개, B ${tierCounts[1]}개, C ${tierCounts[2]}개, D ${tierCounts[3]}개</b>입니다.`,
+      `신축·재정비/노후·정체는 개별 동이 아니라, 동을 묶은 <b>지역군 분류</b>입니다.`,
+      axisSummary.length ? `축 비교에서 민원강도 평균이 가장 높은 그룹은 <b>${axisSummary.slice().sort((a, b) => Number(b.mean_complaints_per_1000) - Number(a.mean_complaints_per_1000))[0].axis_type}</b>입니다.` : '',
+      topA.length ? `즉시개입(A) 우선 생활권은 <b>${topA.join(', ')}</b>입니다.` : '즉시개입(A) 생활권은 없습니다.',
+      strongest ? `정책지표 중 유출률과 가장 강한 연관은 <b>${strongest.x_variable}</b> (Spearman r=${n2(strongest.spearman_r)}, p=${n2(strongest.spearman_p)})입니다.` : ''
+    ].filter(Boolean).join('<br>');
+
+    const claimRowsRaw = (D.claim_chain_rows || []).slice();
+    const claimRows = claimRowsRaw.map(r => ({
+      claim: String(r.claim ?? r.주장 ?? '-'),
+      data_used: String(r.data_used ?? r.data ?? r.데이터 ?? '-'),
+      processing_expr: String(r.processing_expr ?? r.processing ?? r.처리식 ?? '-'),
+      result_value: String(r.result_value ?? r.result ?? r.결과수치 ?? '-'),
+      limitation: String(r.limitation ?? r.한계 ?? '-'),
+    }));
+    const claimSources = (D.claim_chain_sources || []).filter(Boolean);
+    document.getElementById('claim-bridge').innerHTML =
+      'CH3에서 제시한 지역군 근거를 그대로 결론으로 점프하지 않기 위해, 아래 Claim Chain에 각 주장별 데이터·처리식·수치·한계를 일렬로 공개합니다. ' +
+      '즉, “무엇을 근거로 어디까지 말할 수 있는지”를 심사자가 바로 추적할 수 있도록 구성했습니다.';
+    document.getElementById('tbl-claim-chain').innerHTML = tableHtml(
+      ['주장', '데이터', '처리식', '결과수치', '한계'],
+      claimRows.length
+        ? claimRows.map(r => [r.claim, r.data_used, r.processing_expr, r.result_value, r.limitation])
+        : [[
+          'claim_chain_*.csv 대기',
+          claimSources.length ? claimSources.join(', ') : 'data/processed/claim_chain_*.csv',
+          '-',
+          '-',
+          '현재 입력 파일이 없어 표를 생성하지 못했습니다.'
+        ]]
+    );
+    document.getElementById('claim-guardrail').innerHTML =
+      '<b>상관≠인과</b>: 본 사이트의 상관/회귀 수치는 정책 우선순위 참고 신호이며 인과효과를 단정하지 않습니다.<br>' +
+      '<b>지역군 수준 해석</b>: 신축·재정비/노후·정체는 개별 동이 아닌 지역군 평균 경향으로, 개별 동 단위 판정에는 추가 검증이 필요합니다.';
+
+    const rel = (D.policy_relations || []).slice(0, 8);
+    if (rel.length) {
+      document.getElementById('tbl-tests').innerHTML = tableHtml(
+        ['X 변수', 'Y 변수', 'Spearman r', 'p값'],
+        rel.map(r => [r.x_variable, r.y_variable, n2(r.spearman_r), n2(r.spearman_p)])
+      );
+    } else {
+      const tests = (D.tests || []).slice(0, 8);
+      document.getElementById('tbl-tests').innerHTML = tableHtml(
+        ['변수', 'Spearman r', 'p값', '95% CI'],
+        tests.map(r => [r.variable, n2(r.spearman_r), n2(r.spearman_p), `${n2(r.spearman_ci_low)} ~ ${n2(r.spearman_ci_high)}`])
+      );
+    }
+
+    const sens = D.sensitivity || [];
+    document.getElementById('tbl-sens').innerHTML = tableHtml(
+      ['시나리오', 'TOP10 중복률', '최대', '최소'],
+      sens.map(r => [r.scenario, n2(Number(r.top10_overlap_with_base) * 100) + '%', n2(r.max_rate), n2(r.min_rate)])
+    );
+
+    const vars = c.variables || {};
+    document.getElementById('tbl-vars').innerHTML = tableHtml(
+      ['변수', '의미'],
+      Object.entries(vars).map(([k, v]) => [k, v])
+    );
+
+    if (byRate.length) {
+      const target = byRate[byRate.length - 1].dong;
+      const feat = (D.geo?.features || []).find(f => f.properties.dong === target);
+      if (feat) showDong(feat.properties);
+    }
+  </script>
 </body>
+
 </html>
