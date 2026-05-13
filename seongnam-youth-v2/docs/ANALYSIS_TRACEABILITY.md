@@ -74,10 +74,15 @@
   - `신축·재정비` / `노후·정체` are region-group labels (grouped administrative-dong clusters), not single dongs.
 - Site outputs:
   - Tier criteria, priority, risk charts + axis complaint visual and axis summary table.
+  - Alternative-view charts: destination-bucket composition and concentration(HHI).
   - `outputs/site/chart_data/chapter4_priority_matrix.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_axis_mapping.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_group_comparison.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_topic_group_comparison.csv`
+  - `outputs/site/chart_data/chapter4_axis_destination_bucket_mix_by_group.csv`
+  - `outputs/site/chart_data/chapter4_axis_destination_bucket_concentration_by_group.csv`
+  - `outputs/site/chart_data/chapter4_axis_topic_mix_by_group.csv`
+  - `outputs/site/chart_data/chapter4_axis_topic_concentration_by_group.csv`
   - `outputs/site/chart_data/chapter4_axis_complaint_findings.csv`
   - `outputs/site/chart_data/chapter4_axis_complaint_summary.csv`
   - `outputs/site/chart_data/chapter4_axis_context_evidence.csv`

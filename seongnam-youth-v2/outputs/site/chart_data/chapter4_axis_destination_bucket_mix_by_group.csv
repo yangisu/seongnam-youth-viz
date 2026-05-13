@@ -1,0 +1,13 @@
+﻿axis_group,axis_group_label,axis_group_order,destination_bucket,outflow_n,group_total_outflow,bucket_share
+new_redevelopment,신축·재정비,0,gyeonggi_near_core,553,2314,0.2389801210025929
+new_redevelopment,신축·재정비,0,gyeonggi_other,651,2314,0.2813310285220398
+new_redevelopment,신축·재정비,0,seoul_gangnam3,394,2314,0.1702679343128781
+new_redevelopment,신축·재정비,0,seoul_other,716,2314,0.3094209161624892
+old_stagnant,노후·정체,1,gyeonggi_near_core,1845,6816,0.2706866197183099
+old_stagnant,노후·정체,1,gyeonggi_other,2090,6816,0.306631455399061
+old_stagnant,노후·정체,1,seoul_gangnam3,819,6816,0.1201584507042253
+old_stagnant,노후·정체,1,seoul_other,2062,6816,0.3025234741784037
+mixed_other,혼합/전이,2,gyeonggi_near_core,465,1938,0.239938080495356
+mixed_other,혼합/전이,2,gyeonggi_other,604,1938,0.3116615067079463
+mixed_other,혼합/전이,2,seoul_gangnam3,275,1938,0.1418988648090815
+mixed_other,혼합/전이,2,seoul_other,594,1938,0.3065015479876161

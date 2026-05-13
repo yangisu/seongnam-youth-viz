@@ -18,10 +18,13 @@ python src/05_analysis.py
 Write-Host "[6/6] build destination clusters and policy priority"
 python src/06_policy_focus.py
 
-Write-Host "[7/8] run iterative optimizer"
+Write-Host "[7/9] run iterative optimizer"
 python src/08_iterative_optimizer.py --threshold 0.35 --max-iterations 4
 
-Write-Host "[8/8] build html site"
+Write-Host "[8/9] run axis additional analysis"
+python src/09_axis_additional_analysis.py
+
+Write-Host "[9/9] build html site"
 python src/07_build_site.py
 
 Write-Host "[done] v2 pipeline complete"

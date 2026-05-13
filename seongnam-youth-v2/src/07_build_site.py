@@ -216,6 +216,10 @@ def build_payload() -> tuple[dict, dict[str, pd.DataFrame]]:
     policy_newold_axis_map = load_csv("policy_newold_axis_mapping_by_cluster_2024.csv")
     policy_newold_group_comp = load_csv("policy_newold_group_comparison_2024.csv")
     policy_newold_topic_comp = load_csv("policy_newold_topic_group_comparison_2024.csv")
+    axis_dest_mix = load_csv("axis_destination_bucket_mix_by_group.csv")
+    axis_dest_conc = load_csv("axis_destination_bucket_concentration_by_group.csv")
+    axis_topic_mix = load_csv("axis_topic_mix_by_group.csv")
+    axis_topic_conc = load_csv("axis_topic_concentration_by_group.csv")
     outflow_rank = load_csv("youth_outflow_ranked.csv")
     quality = load_json("complaint_parse_quality_2024.json")
     criteria = load_json("policy_tier_criteria_2024.json")
@@ -315,6 +319,10 @@ def build_payload() -> tuple[dict, dict[str, pd.DataFrame]]:
         "policy_newold_axis_map": policy_newold_axis_map.to_dict(orient="records"),
         "policy_newold_group_comp": policy_newold_group_comp.to_dict(orient="records"),
         "policy_newold_topic_comp": policy_newold_topic_comp.to_dict(orient="records"),
+        "axis_dest_mix": axis_dest_mix.to_dict(orient="records"),
+        "axis_dest_conc": axis_dest_conc.to_dict(orient="records"),
+        "axis_topic_mix": axis_topic_mix.to_dict(orient="records"),
+        "axis_topic_conc": axis_topic_conc.to_dict(orient="records"),
         "tests": tests.to_dict(orient="records"),
         "policy_relations": policy_relations.to_dict(orient="records"),
         "models": models.to_dict(orient="records"),
@@ -352,6 +360,10 @@ def build_payload() -> tuple[dict, dict[str, pd.DataFrame]]:
         "chapter4_policy_newold_axis_mapping.csv": policy_newold_axis_map,
         "chapter4_policy_newold_group_comparison.csv": policy_newold_group_comp,
         "chapter4_policy_newold_topic_group_comparison.csv": policy_newold_topic_comp,
+        "chapter4_axis_destination_bucket_mix_by_group.csv": axis_dest_mix,
+        "chapter4_axis_destination_bucket_concentration_by_group.csv": axis_dest_conc,
+        "chapter4_axis_topic_mix_by_group.csv": axis_topic_mix,
+        "chapter4_axis_topic_concentration_by_group.csv": axis_topic_conc,
         "chapter4_axis_complaint_findings.csv": axis_findings,
         "chapter4_axis_complaint_summary.csv": axis_summary,
         "chapter4_axis_context_evidence.csv": axis_context_evidence,
@@ -449,10 +461,15 @@ def write_traceability_doc() -> None:
   - `신축·재정비` / `노후·정체` are region-group labels (grouped administrative-dong clusters), not single dongs.
 - Site outputs:
   - Tier criteria, priority, risk charts + axis complaint visual and axis summary table.
+  - Alternative-view charts: destination-bucket composition and concentration(HHI).
   - `outputs/site/chart_data/chapter4_priority_matrix.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_axis_mapping.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_group_comparison.csv`
   - `outputs/site/chart_data/chapter4_policy_newold_topic_group_comparison.csv`
+  - `outputs/site/chart_data/chapter4_axis_destination_bucket_mix_by_group.csv`
+  - `outputs/site/chart_data/chapter4_axis_destination_bucket_concentration_by_group.csv`
+  - `outputs/site/chart_data/chapter4_axis_topic_mix_by_group.csv`
+  - `outputs/site/chart_data/chapter4_axis_topic_concentration_by_group.csv`
   - `outputs/site/chart_data/chapter4_axis_complaint_findings.csv`
   - `outputs/site/chart_data/chapter4_axis_complaint_summary.csv`
   - `outputs/site/chart_data/chapter4_axis_context_evidence.csv`
@@ -522,8 +539,23 @@ th{color:#a1a1aa;font-weight:600}
   <p class=\"text-lg text-zinc-400 max-w-4xl\">핵심 흐름은 `공간(어디)` → `재배치 경로(어디로)` → `구조축(신축/노후 지역군)` → `정책우선순위`이며, 월별 상관은 보조 검증으로 분리했습니다.</p>
 </header>
 
-<section class=\"max-w-7xl mx-auto px-6 py-4\">
-  <div class=\"section-num mb-2\">CHAPTER 00 · TRACEABILITY</div>
+<section id=\"ch-intro\" class=\"max-w-7xl mx-auto px-6 py-4\">
+  <div class=\"section-num mb-2\">EXECUTIVE SUMMARY</div>
+  <h2 class=\"text-3xl font-bold mb-2\">심사위원용 결론 요약</h2>
+  <div class=\"grid lg:grid-cols-2 gap-6\">
+    <div class=\"card p-4\">
+      <div class=\"text-sm text-zinc-300 mb-2\">핵심 결론</div>
+      <div id=\"intro-conclusion\" class=\"text-base leading-7 text-zinc-200\"></div>
+    </div>
+    <div class=\"card p-4\">
+      <div class=\"text-sm text-zinc-300 mb-2\">즉시개입(A) + 우선개입(B) 생활권</div>
+      <div id=\"intro-priority\" class=\"text-base leading-7 text-zinc-200\"></div>
+    </div>
+  </div>
+</section>
+
+<section id=\"ch0\" class=\"max-w-7xl mx-auto px-6 py-4\">
+  <div class=\"section-num mb-2\">APPENDIX B · TRACEABILITY</div>
   <h2 class=\"text-3xl font-bold mb-2\">분석 추적성 매트릭스 (무엇/데이터/처리/의미)</h2>
   <div class=\"card p-4 mb-8\">
     <div class=\"axis-note mb-3\">각 분석별로 무엇을 봤는지, 어떤 데이터를 썼는지, 어떻게 가공했는지, 결과가 정책적으로 무엇을 뜻하는지까지 한 줄로 연결합니다.</div>
@@ -535,7 +567,7 @@ th{color:#a1a1aa;font-weight:600}
   </div>
 </section>
 
-<section class=\"max-w-7xl mx-auto px-6 py-4\">
+<section id=\"ch1\" class=\"max-w-7xl mx-auto px-6 py-4\">
   <div class=\"section-num mb-2\">CHAPTER 01 · WHAT</div>
   <h2 class=\"text-3xl font-bold mb-2\">동별 청년 순유출률 지도</h2>
   <div class=\"grid lg:grid-cols-3 gap-6\">
@@ -560,7 +592,7 @@ th{color:#a1a1aa;font-weight:600}
   </div>
 </section>
 
-<section class=\"max-w-7xl mx-auto px-6 py-12\">
+<section id=\"ch2\" class=\"max-w-7xl mx-auto px-6 py-12\">
   <div class=\"section-num mb-2\">CHAPTER 02 · WHERE</div>
   <h2 class=\"text-3xl font-bold mb-2\">성남 내부 재배치 구조</h2>
   <div class=\"grid lg:grid-cols-2 gap-6\">
@@ -581,7 +613,7 @@ th{color:#a1a1aa;font-weight:600}
   </div>
 </section>
 
-<section class=\"max-w-7xl mx-auto px-6 py-12\">
+<section id=\"ch3\" class=\"max-w-7xl mx-auto px-6 py-12\">
   <div class=\"section-num mb-2\">CHAPTER 03 · VALIDATION</div>
   <h2 class=\"text-3xl font-bold mb-2\">월별 상관 보조 검증 (해석 제한 명시)</h2>
   <div class=\"card p-4 mb-6\">
@@ -606,7 +638,7 @@ th{color:#a1a1aa;font-weight:600}
   </div>
 </section>
 
-<section class=\"max-w-7xl mx-auto px-6 py-12\">
+<section id=\"ch4\" class=\"max-w-7xl mx-auto px-6 py-12\">
   <div class=\"section-num mb-2\">CHAPTER 04 · MAIN EVIDENCE</div>
   <h2 class=\"text-3xl font-bold mb-2\">신축/노후 지역군 중심 정책 근거</h2>
   <div class=\"card p-4 mb-6\">
@@ -632,6 +664,17 @@ th{color:#a1a1aa;font-weight:600}
       <div class=\"text-sm text-zinc-300 mb-2\">개입 등급 위험도 맵</div>
       <div class=\"axis-note mb-2\">X축: 6개월 순유출률(%), Y축: 순유출 월 비중(%), 점 크기: 민원강도, 색상: 개입등급</div>
       <div id=\"chart-tier-risk\" style=\"height:320px\"></div>
+    </div>
+  </div>
+  <div class=\"grid lg:grid-cols-2 gap-6 mt-6\">
+    <div class=\"card p-4\">
+      <div class=\"text-sm text-zinc-300 mb-2\">대체 관점 1: 지역군별 외부 유출 목적지 구성</div>
+      <div class=\"axis-note mb-2\">동일한 유출이라도 신축·재정비와 노후·정체 지역군은 도착 권역 구성이 다릅니다.</div>
+      <div id=\"chart-axis-dest-mix\" style=\"height:340px\"></div>
+    </div>
+    <div class=\"card p-4\">
+      <div class=\"text-sm text-zinc-300 mb-2\">목적지 편중 요약(HHI)</div>
+      <table id=\"tbl-axis-dest-concentration\"></table>
     </div>
   </div>
   <div class=\"card p-4 mt-6\">
@@ -679,8 +722,8 @@ th{color:#a1a1aa;font-weight:600}
   </div>
 </section>
 
-<section class=\"max-w-7xl mx-auto px-6 py-12\">
-  <div class=\"section-num mb-2\">CHAPTER 05 · ITERATIVE LOOP</div>
+<section id=\"ch5\" class=\"max-w-7xl mx-auto px-6 py-12\">
+  <div class=\"section-num mb-2\">APPENDIX A · ITERATIVE LOOP</div>
   <h2 class=\"text-3xl font-bold mb-2\">반복형 분석 루프 최적화 결과</h2>
   <div class=\"grid lg:grid-cols-2 gap-6\">
     <div class=\"card p-4\">
@@ -728,6 +771,11 @@ function tableHtml(headers, rows){
 }
 
 const byRate = [...(D.dong||[])].sort((a,b)=>a['청년_순유출률']-b['청년_순유출률']);
+const sectionOrder = ['ch-intro','ch1','ch2','ch4','ch3','ch5','ch0'];
+sectionOrder.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) document.body.appendChild(el);
+});
 
 const methodTrace = [
   ['CH1 WHAT', '동별 청년 순유출 hotspot 식별', 'youth_migration + youth_population + geojson', '(전출-전입)/청년인구*100 + 폴리곤 결합', '순유출 고위험 동을 1차 선별'],
@@ -919,6 +967,15 @@ const allPri = D.priority || [];
 const tierOrder = ['A_즉시개입','B_우선개입','C_모니터링','D_유지'];
 const tierColor = {'A_즉시개입':'#f97316','B_우선개입':'#f59e0b','C_모니터링':'#38bdf8','D_유지':'#64748b'};
 const tierCounts = tierOrder.map(t => allPri.filter(r=>r.policy_tier===t).length);
+const abTargets = allPri.filter(r=>['A_즉시개입','B_우선개입'].includes(r.policy_tier)).map(r=>String(r.dong_cluster||''));
+const abPreview = abTargets.slice(0,8).join(', ');
+document.getElementById('intro-conclusion').innerHTML =
+  `이번 분석의 주근거는 <b>신축·재정비 vs 노후·정체 지역군 비교</b>입니다. ` +
+  `민원강도-순유출률 월별 상관은 보조 검증으로 축소하고, 정책판단은 지역군 구조 차이와 개입등급으로 수행합니다.`;
+document.getElementById('intro-priority').innerHTML =
+  abTargets.length
+    ? `<b>${abTargets.length}개</b> 생활권이 A/B에 해당합니다. ${abPreview}${abTargets.length>8?' ...':''}`
+    : '현재 A/B 우선개입 대상이 식별되지 않았습니다.';
 Plotly.newPlot('chart-tier-bar', [{
   type:'bar',
   x:tierOrder, y:tierCounts,
@@ -1004,6 +1061,54 @@ document.getElementById('tbl-axis-regions').innerHTML = tableHtml(
       .sort((a,b)=>a.localeCompare(b,'ko'));
     return [label, members.length ? members.join(', ') : '—'];
   })
+);
+
+const destLabel = {
+  seoul_gangnam3: '서울 강남3구',
+  seoul_other: '서울 기타',
+  gyeonggi_near_core: '경기 인접핵심',
+  gyeonggi_other: '경기 기타',
+  outside_capital_region: '수도권 외'
+};
+const axisDestMix = (D.axis_dest_mix || []).slice();
+const axisDestConc = (D.axis_dest_conc || []).slice();
+const destBuckets = [...new Set(axisDestMix.map(r=>String(r.destination_bucket||'')))].filter(Boolean);
+if (axisDestMix.length && destBuckets.length){
+  const visibleGroups = ['신축·재정비', '노후·정체', '혼합/전이'];
+  const traces = visibleGroups.map(g => {
+    const sub = axisDestMix.filter(r=>String(r.axis_group_label||'')===g);
+    return {
+      type:'bar',
+      name:g,
+      x:destBuckets.map(b=>destLabel[b] || b),
+      y:destBuckets.map(b=>{
+        const row = sub.find(r=>String(r.destination_bucket||'')===b);
+        return row ? Number(row.bucket_share)*100 : 0;
+      }),
+      hovertemplate:'%{x}<br>%{y:.2f}%<extra>'+g+'</extra>'
+    };
+  }).filter(t=>t.y.some(v=>v>0));
+  Plotly.newPlot('chart-axis-dest-mix', traces, {
+    barmode:'group',
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+    font:{family:'Pretendard',color:'#f4f4f8',size:10},
+    xaxis:{gridcolor:'#252837'},
+    yaxis:{title:'유출 비중(%)',gridcolor:'#252837'},
+    margin:{l:60,r:10,t:10,b:60},
+    legend:{orientation:'h',y:1.1}
+  },{displayModeBar:false});
+}
+document.getElementById('tbl-axis-dest-concentration').innerHTML = tableHtml(
+  ['지역군','주요 목적지','주요 목적지 비중(%)','편중도(HHI)'],
+  axisDestConc
+    .slice()
+    .sort((a,b)=>Number(a.axis_group_order||99)-Number(b.axis_group_order||99))
+    .map(r=>[
+      String(r.axis_group_label || r.axis_group || '-'),
+      destLabel[String(r.top_category||'')] || String(r.top_category||'-'),
+      n2(Number(r.top_share||0)*100),
+      n2(r.hhi)
+    ])
 );
 
 const topicComp = (D.policy_newold_topic_comp || []).slice();
