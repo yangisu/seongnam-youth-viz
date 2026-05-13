@@ -1,12 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/seongnam-youth-v2/outputs/site/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/seongnam-youth-v2/outputs/site/$1"
-    }
-  ]
+  "buildCommand": null,
+  "outputDirectory": "seongnam-youth-v2/outputs/site"
 }

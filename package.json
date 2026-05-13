@@ -1,8 +1,0 @@
-{
-  "name": "seongnam-youth-viz",
-  "version": "1.0.0",
-  "description": "Static deployment for Seongnam Youth Viz",
-  "scripts": {
-    "build": "echo \"Building static site...\""
-  }
-}
