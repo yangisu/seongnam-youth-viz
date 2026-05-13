@@ -1,0 +1,14 @@
+{
+  "quality": "strong",
+  "threshold": 0.35,
+  "best_feature": "complaint_count__x__internal_moves_per_1000_youth",
+  "best_spearman_r": 0.4242491657397108,
+  "best_abs_spearman_r": 0.4242491657397108,
+  "best_iteration": 2,
+  "iterations_run": 2,
+  "evaluated_stages": [
+    "engineered_features",
+    "raw_features"
+  ],
+  "report_path": "D:\\compe\\seongnam_dataanalysis\\seongnam-youth-viz\\seongnam-youth-v2\\docs\\iterative_optimizer_report_2026-05-13.md"
+}

@@ -1,0 +1,4 @@
+subdir,url,filename,notes
+mois_population,https://example.go.kr/path/mois_population_202504.csv,mois_population_202504.csv,Replace with actual source URL
+mois_migration,https://example.go.kr/path/mois_migration_202504.csv,mois_migration_202504.csv,Replace with actual source URL
+seongnam_complaint,https://example.go.kr/path/seongnam_complaint_2024.xlsx,seongnam_complaint_2024.xlsx,Replace with actual source URL
