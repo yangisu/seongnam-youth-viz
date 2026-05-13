@@ -18,12 +18,15 @@ V2 데이터 분석을 통해 도출된 핵심 결론은 다음과 같습니다 
 
 ## 데이터 출처
 
-| 용도 | 출처 | 내용 |
+| 코드 | 출처 | 용도 |
 |---|---|---|
-| 청년 모집단 추정 | data.go.kr | 행정안전부 지역별(행정동) 성별 연령별 주민등록 인구수 |
-| 전입·전출 및 OD 흐름 | data.go.kr | 행정안전부 인구이동 (API 및 CSV) |
-| 동별 민원 키워드 및 상세 | data.seongnam.go.kr | 성남시 민원 상세정보 현황 (수작업 확보본) |
-| 행정동 경계 지도 | GitHub 공개자료 | [raqoon886/Local_HangJeongDong](https://github.com/raqoon886/Local_HangJeongDong) 기반 수정 |
+| 15097972 | data.go.kr | 행정동 성·연령 인구 → 청년 모집단 |
+| 15108093 | data.go.kr | 인구이동 → 전입·전출, OD |
+| 15007386 | data.go.kr | 성남시 인구·세대 보조 |
+| 성남시 벤처기업 | data.go.kr | 동별 경제활력 |
+| data.seongnam.go.kr | 성남시 | 동별 민원 키워드 (수작업) |
+| bigdata.epeople.go.kr | 국민신문고 | 청년 민원 시계열 |
+| GeoJSON | [raqoon886/Local_HangJeongDong](https://github.com/raqoon886/Local_HangJeongDong) | 행정동 경계 (자동 확보) |
 
 > **청년 정의 및 한계점**
 > 본 분석에서 '청년'은 **20~34세**를 기준으로 합니다. 제공되는 인구이동 데이터에는 연령별 분해 상세가 부족하므로, `동별 전체 전입·전출 총량 × 해당 동의 청년 인구 비중`으로 청년 이동량을 추정하였습니다. 이는 청년층의 실제 이동 성향이 전 연령 평균과 다를 수 있다는 한계를 가집니다.
