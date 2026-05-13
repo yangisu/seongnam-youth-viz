@@ -1,0 +1,3 @@
+﻿iteration,features_tested,best_feature,best_stage,sample_n,best_spearman_r,best_abs_spearman_r,delta_from_prev
+1,13,complaint_count,raw_features,30,0.3245828698553948,0.3245828698553948,
+2,21,complaint_count__x__internal_moves_per_1000_youth,engineered_features,30,0.4242491657397108,0.4242491657397108,0.09966629588431597

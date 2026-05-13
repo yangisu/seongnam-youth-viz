@@ -1,0 +1,35 @@
+# 데이터 처리
+pandas>=2.2.0
+numpy>=1.26.0
+geopandas>=0.14.0
+openpyxl>=3.1.0          # xlsx 읽기
+chardet>=5.2.0           # 인코딩 자동 감지 (EUC-KR/CP949 대응)
+
+# 인터랙티브 시각화
+plotly>=5.20.0
+folium>=0.16.0
+streamlit>=1.32.0
+streamlit-folium>=0.20.0
+
+# 정적 시각화
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# 워드클라우드 / 한국어 NLP
+wordcloud>=1.9.3
+konlpy>=0.6.0            # JPype1, JDK 필요
+
+# 통계·회귀
+scipy>=1.12.0
+scikit-learn>=1.4.0
+statsmodels>=0.14.0
+
+# HTTP / 스크래핑 (필요 시)
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+playwright>=1.54.0       # browser-based download automation
+
+# 개발 편의
+jupyter>=1.0.0
+ipykernel>=6.29.0
+tqdm>=4.66.0

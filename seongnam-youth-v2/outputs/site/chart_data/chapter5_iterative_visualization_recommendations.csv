@@ -1,0 +1,9 @@
+﻿feature,target,recommended_visual,reason
+complaint_count__x__internal_moves_per_1000_youth,youth_outflow_rate,scatter with trendline,Interaction feature should be interpreted as a bivariate relationship.
+complaint_count,youth_outflow_rate,sorted bar chart,Single metric ranking is best communicated with ordered bars.
+complaint_count,youth_outflow_rate,sorted bar chart,Single metric ranking is best communicated with ordered bars.
+complaint_count__z,youth_outflow_rate,sorted bar chart,Single metric ranking is best communicated with ordered bars.
+complaint_count__log1p,youth_outflow_rate,sorted bar chart,Single metric ranking is best communicated with ordered bars.
+internal_moves_per_1000_youth,youth_outflow_rate,sorted bar chart,Single metric ranking is best communicated with ordered bars.
+internal_moves_per_1000_youth,youth_outflow_rate,sorted bar chart,Single metric ranking is best communicated with ordered bars.
+internal_moves_per_1000_youth__z,youth_outflow_rate,sorted bar chart,Single metric ranking is best communicated with ordered bars.
