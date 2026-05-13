@@ -1,0 +1,68 @@
+{
+  "generated_at_utc": "2026-05-13T04:06:30.675105+00:00",
+  "overall_confidence": "high",
+  "key_conclusions": [
+    {
+      "claim_id": "C1",
+      "text": "노후·정체 권역의 민원강도는 신축·재정비 대비 높다.",
+      "metric_name": "old_vs_new_complaint_intensity_ratio",
+      "metric_value": 2.0176805373631272,
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C2",
+      "text": "노후·정체 권역은 신축·재정비 대비 순유출 압력이 더 크다.",
+      "metric_name": "old_minus_new_weighted_outflow_rate_pctp",
+      "metric_value": 5.756193086524993,
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C4",
+      "text": "월별 순유출 지속성과 연간 순유출률 사이에는 강한 양의 연관이 있다.",
+      "metric_name": "spearman_r_negative_month_share_vs_outflow_rate",
+      "metric_value": 0.9249227224217382,
+      "confidence": "high"
+    }
+  ],
+  "confidence_breakdown": [
+    {
+      "claim_id": "C1",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C2",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C3",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C4",
+      "confidence": "high"
+    },
+    {
+      "claim_id": "C5",
+      "confidence": "low"
+    }
+  ],
+  "cautions": [
+    "민원 데이터는 청년 집단 전용 지표가 아니므로 구조적 불편의 대리신호로 해석해야 한다.",
+    "상관 분석은 인과 추론이 아니며 정책 실험/외생 변수 검증이 추가로 필요하다.",
+    "축 분류 및 정책 등급 규칙은 임계값 변화에 따라 결과가 일부 달라질 수 있다."
+  ],
+  "snapshot_metrics": {
+    "old_vs_new_complaint_intensity_ratio": 2.0176805373631272,
+    "old_minus_new_weighted_outflow_rate_pctp": 5.756193086524993,
+    "urgent_tier_share": 0.1,
+    "old_weighted_outflow_rate": 1.7847495379365907,
+    "new_weighted_outflow_rate": -3.9714435485884025,
+    "old_over_abs_new_outflow_ratio": 0.4493956708942663,
+    "top_topic_group_by_share_gap": "시설노후/파손",
+    "top_topic_share_gap_new_minus_old": -0.0275900668498042,
+    "spearman_r_negative_month_share_vs_outflow_rate": 0.9249227224217382,
+    "spearman_p_negative_month_share_vs_outflow_rate": 2.7852858114609873e-13,
+    "urgent_cluster_count": 3,
+    "cluster_count": 30
+  }
+}

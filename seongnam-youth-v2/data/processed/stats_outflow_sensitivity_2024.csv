@@ -1,0 +1,4 @@
+﻿scenario,out_multiplier,in_multiplier,top10_overlap_with_base,max_rate,min_rate
+base,1.0,1.0,1.0,4.776622646810901,-8.543539190103413
+low_bias,0.9,1.1,1.0,1.5909427260618618,-11.614960858219778
+high_bias,1.1,0.9,0.9,8.00599419312541,-5.47211752198705

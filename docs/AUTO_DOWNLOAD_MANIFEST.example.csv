@@ -1,5 +1,0 @@
-subdir,url,filename,note
-mois_population,https://example.com/mois_population_latest.csv,mois_population_latest.csv,행정동 성연령 인구 CSV
-mois_migration,https://example.com/mois_migration_2025_01.csv,mois_migration_2025_01.csv,인구이동 CSV
-venture,https://example.com/seongnam_venture.csv,seongnam_venture.csv,벤처기업 현황 CSV
-vendor,https://example.com/seongnam_vendor.csv,seongnam_vendor.csv,가맹점/통신판매업 CSV

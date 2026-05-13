@@ -1,0 +1,24 @@
+{
+  "destination_cluster_rows": 200,
+  "destination_profile_rows": 50,
+  "intra_cluster_flow_rows": 815,
+  "intra_cluster_top_pairs_rows": 40,
+  "intra_cluster_matrix_top12_rows": 142,
+  "priority_rows": 30,
+  "policy_relation_rows": 4,
+  "newold_axis_map_rows": 30,
+  "newold_group_summary_rows": 3,
+  "newold_topic_comparison_rows": 8,
+  "tier_counts": {
+    "D_유지": 11,
+    "C_모니터링": 10,
+    "B_우선개입": 6,
+    "A_즉시개입": 3
+  },
+  "urgent_clusters": [
+    "은행동",
+    "수진동",
+    "상대원동"
+  ],
+  "criteria_file": "policy_tier_criteria_2024.json"
+}

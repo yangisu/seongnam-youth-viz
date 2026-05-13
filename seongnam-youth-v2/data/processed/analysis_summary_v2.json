@@ -1,0 +1,15 @@
+{
+  "tests_rows": 5,
+  "models_rows": 9,
+  "sensitivity_rows": 3,
+  "monthly_panel_rows": 180,
+  "monthly_assoc_rows": 4,
+  "monthly_lag_rows": 28,
+  "horizon_assoc_rows": 3,
+  "horizon_points_rows": 150,
+  "topic_horizon_rows": 10,
+  "topic_horizon_points_rows": 231,
+  "topic_cross_rows": 5,
+  "months_in_city_series": 6,
+  "economy_removed": true
+}

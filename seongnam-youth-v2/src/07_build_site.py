@@ -491,28 +491,7 @@ def write_traceability_doc() -> None:
   - `outputs/site/chart_data/chapter2_intra_cluster_matrix_top12.csv`
   - `outputs/site/chart_data/chapter2_intra_cluster_pairs.csv`
 
-## Chapter 3 (VALIDATION: 월별 상관 보조 검증)
-- What was analyzed:
-  - Whether complaint pressure co-moves with youth outflow over time.
-- Data used:
-  - `od_youth_monthly_dong.csv`
-  - `complaint_by_cluster_month_2024.csv`
-  - `youth_population_by_dong.csv`
-- Processing:
-  - Monthly city rollup (`youth_net`, `complaint_count`).
-  - Horizon windows (3/6/12 months) and association tests (Spearman/Pearson/OLS).
-- What result means:
-  - Sign and strength of coefficients show whether complaint pressure and outflow pressure move together.
-  - In this project, the monthly association is not strong enough to serve as the main policy evidence, so it is treated as a validation-only layer.
-- Site outputs:
-  - Monthly dual-axis trend + horizon scatter + association table.
-  - `outputs/site/chart_data/chapter3_monthly_city.csv`
-  - `outputs/site/chart_data/chapter3_monthly_lag_points.csv`
-  - `outputs/site/chart_data/chapter3_monthly_assoc.csv`
-  - `outputs/site/chart_data/chapter3_horizon_assoc.csv`
-  - `outputs/site/chart_data/chapter3_horizon_points.csv`
-
-## Chapter 4 (MAIN EVIDENCE: 정책 우선순위 + 신축/노후 지역군)
+## Chapter 3 (MAIN EVIDENCE: 정책 우선순위 + 신축/노후 지역군)
 - What was analyzed:
   - Intervention tiers (A/B/C/D) and axis differences (`신축·재정비` vs `노후·정체`) in complaint/outflow patterns.
   - Claim chain to make conclusion derivation explicit (claim -> data -> processing -> numeric result -> limitation).
@@ -556,24 +535,19 @@ def write_traceability_doc() -> None:
   - `outputs/site/chart_data/chapter4_models.csv`
   - `outputs/site/chart_data/chapter4_sensitivity.csv`
 
-## Chapter 5 (ITERATIVE LOOP: 반복형 신호 강화)
+## Chapter 4 (CLAIM CHAIN: 결론 도출 과정 검증)
 - What was analyzed:
-  - How much engineered features improve association compared to raw features.
+  - Claim-by-claim evidence chain to reduce logical leap from findings to conclusions.
 - Data used:
-  - `iterative_feature_correlation_v2.csv`
-  - `iterative_optimizer_summary_v2.json`
-  - `iterative_visualization_recommendations_v2.csv`
-  - `policy_priority_matrix_2024.csv` (for interaction scatter points)
+  - `claim_chain_*.csv`
+  - `claim_chain_*.json`
 - Processing:
-  - Iteration-wise best absolute Spearman extraction.
-  - Raw -> engineered/interactions loop progression tracking.
+  - Standardized table: claim -> data -> formula -> numeric result -> limitation.
+  - Explicit guardrails for non-causal interpretation and region-group level claims.
 - What result means:
-  - Improvement by iteration validates whether repeated feature engineering materially increases explanatory signal.
+  - Judges can audit exactly what each conclusion is based on and where interpretation must stop.
 - Site outputs:
-  - Loop progress chart + loop table + top-signal chart + interaction scatter + visualization recommendations.
-  - `outputs/site/chart_data/chapter5_iterative_feature_correlation.csv`
-  - `outputs/site/chart_data/chapter5_iterative_loop_progress.csv`
-  - `outputs/site/chart_data/chapter5_iterative_visualization_recommendations.csv`
+  - `outputs/site/chart_data/chapter4_claim_chain_table.csv`
 """
     (ROOT / "docs" / "ANALYSIS_TRACEABILITY.md").write_text(content, encoding="utf-8")
 
@@ -614,7 +588,7 @@ th{color:#a1a1aa;font-weight:600}
 <header class=\"max-w-7xl mx-auto px-6 pt-10 pb-6\">
   <div class=\"section-num mb-3\">SEONGNAM YOUTH POLARIZATION · V2</div>
   <h1 class=\"text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-4\">어디서 빠지고,<br><span class=\"punchline\">어디서 다시 재배치되는가</span></h1>
-  <p class=\"text-lg text-zinc-400 max-w-4xl\">핵심 흐름은 `공간(어디)` → `재배치 경로(어디로)` → `구조축(신축/노후 지역군)` → `정책우선순위`이며, 월별 상관은 보조 검증으로 분리했습니다.</p>
+  <p class=\"text-lg text-zinc-400 max-w-4xl\">핵심 흐름은 `공간(어디)` → `재배치 경로(어디로)` → `구조축(신축/노후 지역군)` → `결론 도출 검증(Claim Chain)`입니다.</p>
 </header>
 
 <section id=\"ch-intro\" class=\"max-w-7xl mx-auto px-6 py-4\">
@@ -641,7 +615,7 @@ th{color:#a1a1aa;font-weight:600}
   </div>
   <div class=\"card p-4\">
     <div class=\"text-sm text-zinc-300 mb-2\">이해 흐름 가이드</div>
-    <div class=\"axis-note\">CH1에서 순유출 hotspot을 식별하고, CH2에서 실제 내부 재배치 통로를 확인한 뒤, CH4에서 `신축·재정비 vs 노후·정체 지역군` 차이를 중심 근거로 제시합니다. CH3은 “민원강도-순유출률 상관”이 약함을 확인하는 보조 검증입니다.</div>
+    <div class=\"axis-note\">CH1에서 순유출 hotspot을 식별하고, CH2에서 실제 내부 재배치 통로를 확인한 뒤, CH3에서 `신축·재정비 vs 노후·정체 지역군` 차이를 핵심 근거로 제시합니다. CH4는 결론 도출 과정을 주장-근거 체인으로 검증합니다.</div>
   </div>
 </section>
 
@@ -680,10 +654,14 @@ th{color:#a1a1aa;font-weight:600}
       <div id=\"heat-intra\" style=\"height:430px\"></div>
     </div>
     <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">상위 생활권 이동쌍 TOP 20</div>
+      <div class=\"text-sm text-zinc-300 mb-2\">상위 생활권 이동쌍 TOP 10</div>
       <div class=\"axis-note mb-2\">성남 내부에서 실제로 이동량이 큰 출발→도착 조합이며, 전체 내부이동 대비 비중(%)은 “어느 통로에 이동 압력이 몰리는지”를 보여줍니다.</div>
       <table id=\"tbl-pairs\"></table>
     </div>
+  </div>
+  <div class=\"card p-4 mt-6\">
+    <div class=\"text-sm text-zinc-300 mb-2\">히트맵 해석</div>
+    <div id=\"chapter2-heat-interpret\" class=\"axis-note\"></div>
   </div>
   <div class=\"card p-4 mt-6\">
     <div class=\"text-sm text-zinc-300 mb-2\">왜 중요한가?</div>
@@ -691,33 +669,8 @@ th{color:#a1a1aa;font-weight:600}
   </div>
 </section>
 
-<section id=\"ch3\" class=\"max-w-7xl mx-auto px-6 py-12\">
-  <div class=\"section-num mb-2\">CHAPTER 03 · VALIDATION</div>
-  <h2 class=\"text-3xl font-bold mb-2\">월별 상관 보조 검증 (해석 제한 명시)</h2>
-  <div class=\"card p-4 mb-6\">
-    <div class=\"axis-note\">이 장은 “민원강도와 순유출률의 월별 동행”을 검증했지만, 상관이 충분히 강하지 않아 본 분석의 중심 근거로 사용하지 않습니다. 그래서 정책 해석의 중심은 CH4 구조축 비교로 이동합니다.</div>
-  </div>
-  <div class=\"grid lg:grid-cols-2 gap-6\">
-    <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">월별 순이동(막대) vs 민원건수(선)</div>
-      <div class=\"axis-note mb-2\">X축: 월, 왼쪽 Y축: 순이동(명), 오른쪽 Y축: 민원건수. 순이동이 음수면 순유출.</div>
-      <div id=\"chart-monthly\" style=\"height:360px\"></div>
-    </div>
-    <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">민원강도와 순유출률의 3/6/12개월 창 연관</div>
-      <div class=\"axis-note mb-2\">X축: 민원강도(window 평균), Y축: 순유출률(window 평균). 색상/모양은 기간창(3·6·12개월)을 의미합니다.</div>
-      <div id=\"chart-lag\" style=\"height:360px\"></div>
-      <div id=\"lag-summary\" class=\"mt-3 text-sm text-zinc-300\"></div>
-    </div>
-  </div>
-  <div class=\"card p-4 mt-6\">
-    <div class=\"text-sm text-zinc-300 mb-2\">기간창별 연관 검정 결과 요약</div>
-    <table id=\"tbl-monthly-assoc\"></table>
-  </div>
-</section>
-
 <section id=\"ch4\" class=\"max-w-7xl mx-auto px-6 py-12\">
-  <div class=\"section-num mb-2\">CHAPTER 04 · MAIN EVIDENCE</div>
+  <div class=\"section-num mb-2\">CHAPTER 03 · MAIN EVIDENCE</div>
   <h2 class=\"text-3xl font-bold mb-2\">신축/노후 지역군 중심 정책 근거</h2>
   <div class=\"card p-4 mb-6\">
     <div class=\"axis-note\">여기서 `신축·재정비`, `노후·정체`는 개별 행정동을 묶은 <b>지역군(생활권 클러스터)</b>입니다. 즉 “지역 분류”가 맞습니다.</div>
@@ -733,7 +686,7 @@ th{color:#a1a1aa;font-weight:600}
       <table id=\"tbl-priority\"></table>
     </div>
   </div>
-  <div class=\"grid lg:grid-cols-2 gap-6 mt-6\">
+  <div class=\"grid lg:grid-cols-3 gap-6 mt-6\">
     <div class=\"card p-4\">
       <div class=\"text-sm text-zinc-300 mb-2\">개입 등급 분포</div>
       <div id=\"chart-tier-bar\" style=\"height:280px\"></div>
@@ -742,6 +695,11 @@ th{color:#a1a1aa;font-weight:600}
       <div class=\"text-sm text-zinc-300 mb-2\">개입 등급 위험도 맵</div>
       <div class=\"axis-note mb-2\">X축: 6개월 순유출률(%), Y축: 순유출 월 비중(%), 점 크기: 민원강도, 색상: 개입등급</div>
       <div id=\"chart-tier-risk\" style=\"height:320px\"></div>
+    </div>
+    <div class=\"card p-4\">
+      <div class=\"text-sm text-zinc-300 mb-2\">핵심 도표: 지역군별 민원강도 분포</div>
+      <div class=\"axis-note mb-2\">X축=지역군, Y축=총인구 1천명당 민원강도. PC 화면에서 위험도 맵과 나란히 비교해 해석합니다.</div>
+      <div id=\"chart-axis-complaint\" style=\"height:320px\"></div>
     </div>
   </div>
   <div class=\"grid lg:grid-cols-2 gap-6 mt-6\">
@@ -754,11 +712,6 @@ th{color:#a1a1aa;font-weight:600}
       <div class=\"text-sm text-zinc-300 mb-2\">목적지 편중 요약(HHI)</div>
       <table id=\"tbl-axis-dest-concentration\"></table>
     </div>
-  </div>
-  <div class=\"card p-4 mt-6\">
-    <div class=\"text-sm text-zinc-300 mb-2\">핵심 도표: 지역군(신축·재정비 vs 노후·정체)별 민원강도 분포</div>
-    <div class=\"axis-note mb-2\">X축은 지역군, Y축은 총인구 1천명당 민원강도입니다. 이 도표를 본 분석의 중심 근거로 사용합니다.</div>
-    <div id=\"chart-axis-complaint\" style=\"height:460px\"></div>
   </div>
   <div class=\"grid lg:grid-cols-2 gap-6 mt-6\">
     <div class=\"card p-4\">
@@ -801,7 +754,7 @@ th{color:#a1a1aa;font-weight:600}
 </section>
 
 <section id=\"ch-claim\" class=\"max-w-7xl mx-auto px-6 py-12\">
-  <div class=\"section-num mb-2\">CHAPTER 04.5 · CLAIM CHAIN</div>
+  <div class=\"section-num mb-2\">CHAPTER 04 · CLAIM CHAIN</div>
   <h2 class=\"text-3xl font-bold mb-2\">결론 도출 과정 (Claim → Data → Method → Number → Limitation)</h2>
   <div class=\"card p-4 mb-6\">
     <div id=\"claim-bridge\" class=\"axis-note\"></div>
@@ -816,44 +769,6 @@ th{color:#a1a1aa;font-weight:600}
   </div>
 </section>
 
-<section id=\"ch5\" class=\"max-w-7xl mx-auto px-6 py-12\">
-  <div class=\"section-num mb-2\">APPENDIX A · ITERATIVE LOOP</div>
-  <h2 class=\"text-3xl font-bold mb-2\">반복형 분석 루프 최적화 결과</h2>
-  <div class=\"grid lg:grid-cols-2 gap-6\">
-    <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">루프 요약</div>
-      <table id=\"tbl-iterative-summary\"></table>
-    </div>
-    <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">반복 단계별 성능 추이</div>
-      <div class=\"axis-note mb-2\">반복(iteration)이 증가할 때 최고 절대 Spearman 신호가 실제로 강화되는지 추적합니다.</div>
-      <div id=\"chart-iter-loop\" style=\"height:320px\"></div>
-    </div>
-  </div>
-  <div class=\"grid lg:grid-cols-2 gap-6 mt-6\">
-    <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">TOP 신호(절대 Spearman)</div>
-      <div class=\"axis-note mb-2\">상관이 약하면 피처 엔지니어링/상호작용 결합으로 재평가한 결과를 단계별로 비교합니다.</div>
-      <div id=\"chart-iter-top\" style=\"height:320px\"></div>
-    </div>
-    <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">반복 루프 상세 로그</div>
-      <table id=\"tbl-iter-loop\"></table>
-    </div>
-  </div>
-  <div class=\"grid lg:grid-cols-2 gap-6 mt-6\">
-    <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">최적 상호작용 피처 산점도</div>
-      <div class=\"axis-note mb-2\">`A__x__B` 형태의 최적 결합 피처를 원천 피처로 분해해 관계를 직관적으로 확인합니다.</div>
-      <div id=\"chart-iter-interaction\" style=\"height:320px\"></div>
-    </div>
-    <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">시각화 솔루션 권고안</div>
-      <table id=\"tbl-iter-reco\"></table>
-    </div>
-  </div>
-</section>
-
 <script>
 const D = window.SN_DATA || {};
 const fmt = n => (n==null||Number.isNaN(Number(n))?'—':Number(n).toLocaleString('ko-KR'));
@@ -865,7 +780,7 @@ function tableHtml(headers, rows){
 }
 
 const byRate = [...(D.dong||[])].sort((a,b)=>a['청년_순유출률']-b['청년_순유출률']);
-const sectionOrder = ['ch-intro','ch1','ch2','ch4','ch-claim','ch3','ch5','ch0'];
+const sectionOrder = ['ch-intro','ch1','ch2','ch4','ch-claim','ch0'];
 sectionOrder.forEach(id => {
   const el = document.getElementById(id);
   if (el) document.body.appendChild(el);
@@ -874,10 +789,8 @@ sectionOrder.forEach(id => {
 const methodTrace = [
   ['CH1 WHAT', '동별 청년 순유출 hotspot 식별', 'youth_migration + youth_population + geojson', '(전출-전입)/청년인구*100 + 폴리곤 결합', '순유출 고위험 동을 1차 선별'],
   ['CH2 WHERE', '성남 내부 재배치 경로 식별', 'od_youth_intra_seongnam_dong', '동 OD -> 생활권 행렬 + 상위 경로 추출', '내부 이동 집중 통로 파악'],
-  ['CH3 VALIDATION', '월별 상관 보조 검증', 'monthly OD + monthly complaints', '월집계 + 3/6/12개월 창 연관검정', '약한 상관 확인 후 중심 해석 축 전환'],
-  ['CH4 MAIN EVIDENCE', '개입등급 + 신축/노후 지역군 비교', 'priority + policy_newold_axis/group/topic', '플래그 규칙/점수화 + 축 그룹 집계 + 토픽구성 비교', '정책 우선순위와 지역군별 구조 차이 해석'],
-  ['CH4.5 CLAIM CHAIN', '주장-근거 연결 검증', 'claim_chain_*.csv/json', '주장→데이터→처리식→수치→한계 표준화', '논리적 비약/과장 해석 방지'],
-  ['CH5 ITERATIVE', '반복형 피처엔지니어링 효과', 'iterative correlations/recommendations', 'iteration별 최고 신호 추적 + 상호작용 분해', '재평가 루프로 신호 강화 확인'],
+  ['CH3 MAIN EVIDENCE', '개입등급 + 신축/노후 지역군 비교', 'priority + policy_newold_axis/group/topic + axis_*', '플래그 규칙/점수화 + 축 그룹 집계 + 토픽/목적지 구성 비교', '정책 우선순위와 지역군별 구조 차이 해석'],
+  ['CH4 CLAIM CHAIN', '주장-근거 연결 검증', 'claim_chain_*.csv/json', '주장→데이터→처리식→수치→한계 표준화', '논리적 비약/과장 해석 방지'],
 ];
 document.getElementById('tbl-method-trace').innerHTML = tableHtml(
   ['분석', '무엇을 분석', '어떤 데이터', '어떻게 처리', '결과 의미'],
@@ -946,7 +859,7 @@ Plotly.newPlot('heat-intra', [{
   margin:{l:90,r:12,t:12,b:80}
 },{displayModeBar:false});
 
-const pairs = (D.od_intra_pairs||[]).slice(0,20);
+const pairs = (D.od_intra_pairs||[]).slice(0,10);
 const totalIntra = (D.od_intra||[]).reduce((acc,row)=>acc + Number(row.n||0), 0);
 document.getElementById('tbl-pairs').innerHTML = tableHtml(
   ['순위','출발','도착','이동(명)','내부이동 비중(%)'],
@@ -959,85 +872,29 @@ document.getElementById('tbl-pairs').innerHTML = tableHtml(
   ])
 );
 const top3Pairs = pairs.slice(0,3).map(r=>`${r.origin_cluster}→${r.dest_cluster}`).join(', ');
+let topIn = '';
+let topOut = '';
+if (m.length){
+  const inTotals = {};
+  const outTotals = {};
+  m.forEach(r=>{
+    const o = String(r.origin_cluster||'');
+    const d = String(r.dest_cluster||'');
+    const n = Number(r.n||0);
+    outTotals[o] = (outTotals[o]||0) + n;
+    inTotals[d] = (inTotals[d]||0) + n;
+  });
+  topIn = Object.entries(inTotals).sort((a,b)=>b[1]-a[1])[0]?.[0] || '';
+  topOut = Object.entries(outTotals).sort((a,b)=>b[1]-a[1])[0]?.[0] || '';
+}
+document.getElementById('chapter2-heat-interpret').innerHTML =
+  topIn && topOut
+    ? `히트맵에서 가장 진한 셀은 내부 재배치가 집중된 통로를 의미합니다. 현재는 <b>${topOut}</b> 출발과 <b>${topIn}</b> 도착 축의 이동량이 크며, 이는 생활권 간 이동 압력이 특정 축으로 수렴함을 보여줍니다.`
+    : '히트맵 해석을 위한 충분한 이동량 데이터가 없습니다.';
 document.getElementById('chapter2-meaning').innerHTML =
   top3Pairs
     ? `상위 이동쌍은 단순 순위가 아니라, 청년 재배치가 실제로 집중되는 “핵심 이동 통로”입니다. TOP3(<b>${top3Pairs}</b>)는 개입 우선 생활권과 연결해 원인-결과 경로를 설명하는 근거가 됩니다.`
     : '현재 월의 유의미한 상위 이동쌍이 충분하지 않습니다.';
-
-// CH3 monthly
-const city = (D.monthly_city||[]).slice().sort((a,b)=>String(a.month).localeCompare(String(b.month)));
-const monthLab = city.map(r=>String(r.month).slice(0,4)+'-'+String(r.month).slice(4));
-Plotly.newPlot('chart-monthly', [
-  {type:'bar', x:monthLab, y:city.map(r=>Number(r.youth_net)), name:'순이동(명)', marker:{color:city.map(r=>Number(r.youth_net)>=0?'rgba(56,189,248,0.75)':'rgba(249,115,22,0.75)')}, yaxis:'y1'},
-  {type:'scatter', mode:'lines+markers', x:monthLab, y:city.map(r=>Number(r.complaint_count)), name:'민원건수', line:{color:'#facc15',width:2}, marker:{size:6}, yaxis:'y2'}
-], {
-  paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-  font:{family:'Pretendard',color:'#f4f4f8',size:10},
-  xaxis:{gridcolor:'#252837'},
-  yaxis:{title:'순이동(명)',gridcolor:'#252837',zerolinecolor:'#666'},
-  yaxis2:{title:'민원건수',overlaying:'y',side:'right',showgrid:false},
-  legend:{orientation:'h',y:1.1},
-  margin:{l:60,r:60,t:10,b:50},
-  shapes:[{type:'line',x0:0,x1:1,y0:0,y1:0,xref:'paper',line:{color:'#666',dash:'dash',width:1}}]
-},{displayModeBar:false});
-
-const horizonPoints = D.horizon_points || [];
-const horizonAssoc = D.horizon_assoc || [];
-const hStyles = {
-  3: {name:'3개월', color:'rgba(249,115,22,0.72)', symbol:'circle'},
-  6: {name:'6개월', color:'rgba(56,189,248,0.72)', symbol:'diamond'},
-  12: {name:'12개월', color:'rgba(168,85,247,0.72)', symbol:'square'}
-};
-const lagTraces = [3,6,12].map(h=>{
-  const sub = horizonPoints.filter(r=>Number(r.horizon_months)===h);
-  const style = hStyles[h];
-  return {
-    type:'scatter', mode:'markers', name:style.name,
-    x:sub.map(r=>Number(r.complaint_window)),
-    y:sub.map(r=>Number(r.outflow_window)),
-    text:sub.map(r=>`${r.dong_cluster} (${String(r.end_month).slice(0,4)}-${String(r.end_month).slice(4)})`),
-    marker:{
-      size:sub.map(()=>8),
-      color:style.color,
-      symbol:style.symbol,
-      line:{width:1,color:'#0a0a0f'}
-    },
-    hovertemplate:'%{text}<br>민원강도(window): %{x:.2f}<br>순유출률(window): %{y:.2f}%<extra></extra>'
-  };
-}).filter(t=>t.x.length>0);
-Plotly.newPlot('chart-lag', lagTraces, {
-  paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-  font:{family:'Pretendard',color:'#f4f4f8',size:10},
-  xaxis:{title:'민원강도(총인구 1천명당, window 평균)',gridcolor:'#252837'},
-  yaxis:{title:'청년 순유출률(window 평균, %)',gridcolor:'#252837'},
-  margin:{l:60,r:10,t:10,b:50},
-  legend:{orientation:'h',y:1.1}
-},{displayModeBar:false});
-
-const h3 = horizonAssoc.find(r=>Number(r.horizon_months)===3);
-const h6 = horizonAssoc.find(r=>Number(r.horizon_months)===6);
-const h12 = horizonAssoc.find(r=>Number(r.horizon_months)===12);
-function hText(row){
-  if (!row || row.status!=='ok') return '데이터 부족';
-  const s = Math.abs(Number(row.spearman_r||0));
-  const level = s>=0.3 ? '중간 이상' : (s>=0.1 ? '약함' : '매우 약함');
-  return `${level} (r=${n2(row.spearman_r)}, p=${n2(row.spearman_p)}, n=${fmt(row.n)})`;
-}
-document.getElementById('lag-summary').innerHTML =
-  `<b>핵심 해석:</b> 3개월=${hText(h3)} / 6개월=${hText(h6)} / 12개월=${hText(h12)}.<br>결론적으로 월별 동행은 보조적 신호이며, 본 분석의 주근거는 CH4의 지역군(신축·재정비/노후·정체) 구조 비교입니다.`;
-
-const assoc = (D.horizon_assoc||[]).map(r=>[
-  `${fmt(r.horizon_months)}개월`,
-  fmt(r.n),
-  r.status==='ok' ? n2(r.spearman_r) : '—',
-  r.status==='ok' ? n2(r.slope) : '—',
-  r.status==='ok' ? n2(r.r2) : '—',
-  r.status==='ok' ? '분석 가능' : '데이터 부족'
-]);
-document.getElementById('tbl-monthly-assoc').innerHTML = tableHtml(
-  ['기간창','표본수','Spearman r','기울기','R²','상태'],
-  assoc
-);
 
 // CH4 evidence
 const c = D.criteria || {};
@@ -1259,7 +1116,7 @@ const claimRows = claimRowsRaw.map(r => ({
 }));
 const claimSources = (D.claim_chain_sources || []).filter(Boolean);
 document.getElementById('claim-bridge').innerHTML =
-  'CH4에서 제시한 지역군 근거를 그대로 결론으로 점프하지 않기 위해, 아래 Claim Chain에 각 주장별 데이터·처리식·수치·한계를 일렬로 공개합니다. ' +
+  'CH3에서 제시한 지역군 근거를 그대로 결론으로 점프하지 않기 위해, 아래 Claim Chain에 각 주장별 데이터·처리식·수치·한계를 일렬로 공개합니다. ' +
   '즉, “무엇을 근거로 어디까지 말할 수 있는지”를 심사자가 바로 추적할 수 있도록 구성했습니다.';
 document.getElementById('tbl-claim-chain').innerHTML = tableHtml(
   ['주장', '데이터', '처리식', '결과수치', '한계'],
@@ -1301,117 +1158,6 @@ const vars = c.variables || {};
 document.getElementById('tbl-vars').innerHTML = tableHtml(
   ['변수','의미'],
   Object.entries(vars).map(([k,v])=>[k,v])
-);
-
-// CH5 iterative loop
-const iterSummary = D.iterative_summary || {};
-const iterCorr = (D.iterative_corr || []).slice();
-const iterReco = (D.iterative_reco || []).slice();
-const iterLoop = (D.iterative_loop_progress || []).slice().sort((a,b)=>Number(a.iteration)-Number(b.iteration));
-
-document.getElementById('tbl-iterative-summary').innerHTML = tableHtml(
-  ['항목', '값'],
-  [
-    ['품질 판정', String(iterSummary.quality || '-')],
-    ['목표 임계치', iterSummary.threshold == null ? '-' : n2(iterSummary.threshold)],
-    ['반복 횟수', iterSummary.iterations_run == null ? '-' : fmt(iterSummary.iterations_run)],
-    ['최종 최적 피처', String(iterSummary.best_feature || '-')],
-    ['최고 절대 Spearman', iterSummary.best_abs_spearman_r == null ? '-' : n2(iterSummary.best_abs_spearman_r)],
-  ]
-);
-
-if (iterLoop.length){
-  Plotly.newPlot('chart-iter-loop', [{
-    type:'scatter',
-    mode:'lines+markers',
-    x:iterLoop.map(r=>`Iter ${fmt(r.iteration)}`),
-    y:iterLoop.map(r=>Number(r.best_abs_spearman_r)),
-    marker:{size:9,color:'#facc15'},
-    line:{width:3,color:'#f97316'},
-    text:iterLoop.map(r=>String(r.best_feature || '-')),
-    hovertemplate:'%{x}<br>best abs r=%{y:.3f}<br>feature=%{text}<extra></extra>'
-  }], {
-    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-    font:{family:'Pretendard',color:'#f4f4f8',size:10},
-    xaxis:{gridcolor:'#252837'},
-    yaxis:{title:'best abs(Spearman r)',gridcolor:'#252837'},
-    margin:{l:60,r:10,t:10,b:45},
-    shapes: iterSummary.threshold == null ? [] : [{
-      type:'line', x0:0, x1:1, xref:'paper',
-      y0:Number(iterSummary.threshold), y1:Number(iterSummary.threshold),
-      line:{color:'#38bdf8',dash:'dash',width:1}
-    }]
-  }, {displayModeBar:false});
-}
-
-document.getElementById('tbl-iter-loop').innerHTML = tableHtml(
-  ['반복', '최고 피처', '최고 abs r', '이전 대비 Δ', '검토 피처수'],
-  iterLoop.map(r=>[
-    fmt(r.iteration),
-    String(r.best_feature || '-'),
-    n2(r.best_abs_spearman_r),
-    r.delta_from_prev == null || Number.isNaN(Number(r.delta_from_prev))
-      ? '-'
-      : (Number(r.delta_from_prev) >= 0 ? '+' : '') + n2(r.delta_from_prev),
-    fmt(r.features_tested),
-  ])
-);
-
-const iterTop = iterCorr
-  .sort((a,b)=>Number(b.abs_spearman_r||0)-Number(a.abs_spearman_r||0))
-  .slice(0,10);
-if (iterTop.length){
-  Plotly.newPlot('chart-iter-top', [{
-    type:'bar',
-    x:iterTop.map(r=>String(r.feature)),
-    y:iterTop.map(r=>Number(r.abs_spearman_r)),
-    marker:{color:iterTop.map(r=>String(r.stage).includes('engineered') ? '#f97316' : '#38bdf8')},
-    customdata:iterTop.map(r=>[r.stage, r.iteration, r.n, r.spearman_r]),
-    hovertemplate:'%{x}<br>abs_r=%{y:.3f}<br>stage=%{customdata[0]}<br>iter=%{customdata[1]}<br>n=%{customdata[2]}<br>r=%{customdata[3]:.3f}<extra></extra>'
-  }],{
-    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-    font:{family:'Pretendard',color:'#f4f4f8',size:10},
-    xaxis:{tickangle:-35,gridcolor:'#252837'},
-    yaxis:{title:'abs(Spearman r)',gridcolor:'#252837'},
-    margin:{l:55,r:10,t:10,b:120}
-  },{displayModeBar:false});
-}
-
-const bestInteraction = iterCorr.find(r=>String(r.feature||'').includes('__x__'));
-if (bestInteraction){
-  const parts = String(bestInteraction.feature).split('__x__');
-  const left = parts[0];
-  const right = parts[1];
-  const points = (D.priority||[])
-    .filter(r => Number.isFinite(Number(r[left])) && Number.isFinite(Number(r[right])) && Number.isFinite(Number(r.youth_outflow_rate)));
-  if (points.length){
-    Plotly.newPlot('chart-iter-interaction', [{
-      type:'scatter',
-      mode:'markers',
-      x:points.map(r=>Number(r[left])),
-      y:points.map(r=>Number(r[right])),
-      text:points.map(r=>String(r.dong_cluster||'')),
-      marker:{
-        size:points.map(r=>Math.max(8, Math.abs(Number(r.youth_outflow_rate))*2)),
-        color:points.map(r=>Number(r.youth_outflow_rate)),
-        colorscale:'YlOrRd',
-        showscale:true,
-        colorbar:{title:'outflow'}
-      },
-      hovertemplate:'%{text}<br>'+left+': %{x:.3f}<br>'+right+': %{y:.3f}<extra></extra>'
-    }],{
-      paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-      font:{family:'Pretendard',color:'#f4f4f8',size:10},
-      xaxis:{title:left,gridcolor:'#252837'},
-      yaxis:{title:right,gridcolor:'#252837'},
-      margin:{l:60,r:20,t:10,b:55}
-    },{displayModeBar:false});
-  }
-}
-
-document.getElementById('tbl-iter-reco').innerHTML = tableHtml(
-  ['feature', 'recommended visual', 'reason'],
-  iterReco.slice(0,8).map(r=>[String(r.feature||'-'), String(r.recommended_visual||'-'), String(r.reason||'-')])
 );
 
 if (byRate.length){

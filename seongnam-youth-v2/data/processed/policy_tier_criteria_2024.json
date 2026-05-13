@@ -1,0 +1,25 @@
+{
+  "tier_rule": {
+    "A_즉시개입": "세 가지 위험 플래그 모두 충족",
+    "B_우선개입": "세 가지 중 두 개 충족",
+    "C_모니터링": "세 가지 중 한 개 충족",
+    "D_유지": "세 가지 모두 미충족"
+  },
+  "thresholds": {
+    "youth_outflow_rate_q70": 1.5906902908135125,
+    "negative_month_share_q70": 0.8333333333333334,
+    "complaints_per_1000_totalpop_q60": 14.619228641012336
+  },
+  "variables": {
+    "youth_outflow_rate": "6개월 누적 청년 순유출률(%)",
+    "negative_month_share": "관측월 중 순유출(순이동<0) 발생 비중",
+    "complaints_per_1000_totalpop": "연간 총인구 1천명당 민원 건수",
+    "internal_moves_per_1000_youth": "청년 1천명당 성남 내부 동간 이동량"
+  },
+  "priority_score_weights": {
+    "youth_outflow_rate": 0.45,
+    "negative_month_share": 0.25,
+    "complaints_per_1000_totalpop": 0.2,
+    "internal_moves_per_1000_youth": 0.1
+  }
+}

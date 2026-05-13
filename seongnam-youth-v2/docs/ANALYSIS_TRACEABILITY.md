@@ -31,28 +31,7 @@
   - `outputs/site/chart_data/chapter2_intra_cluster_matrix_top12.csv`
   - `outputs/site/chart_data/chapter2_intra_cluster_pairs.csv`
 
-## Chapter 3 (VALIDATION: 월별 상관 보조 검증)
-- What was analyzed:
-  - Whether complaint pressure co-moves with youth outflow over time.
-- Data used:
-  - `od_youth_monthly_dong.csv`
-  - `complaint_by_cluster_month_2024.csv`
-  - `youth_population_by_dong.csv`
-- Processing:
-  - Monthly city rollup (`youth_net`, `complaint_count`).
-  - Horizon windows (3/6/12 months) and association tests (Spearman/Pearson/OLS).
-- What result means:
-  - Sign and strength of coefficients show whether complaint pressure and outflow pressure move together.
-  - In this project, the monthly association is not strong enough to serve as the main policy evidence, so it is treated as a validation-only layer.
-- Site outputs:
-  - Monthly dual-axis trend + horizon scatter + association table.
-  - `outputs/site/chart_data/chapter3_monthly_city.csv`
-  - `outputs/site/chart_data/chapter3_monthly_lag_points.csv`
-  - `outputs/site/chart_data/chapter3_monthly_assoc.csv`
-  - `outputs/site/chart_data/chapter3_horizon_assoc.csv`
-  - `outputs/site/chart_data/chapter3_horizon_points.csv`
-
-## Chapter 4 (MAIN EVIDENCE: 정책 우선순위 + 신축/노후 지역군)
+## Chapter 3 (MAIN EVIDENCE: 정책 우선순위 + 신축/노후 지역군)
 - What was analyzed:
   - Intervention tiers (A/B/C/D) and axis differences (`신축·재정비` vs `노후·정체`) in complaint/outflow patterns.
   - Claim chain to make conclusion derivation explicit (claim -> data -> processing -> numeric result -> limitation).
@@ -96,21 +75,16 @@
   - `outputs/site/chart_data/chapter4_models.csv`
   - `outputs/site/chart_data/chapter4_sensitivity.csv`
 
-## Chapter 5 (ITERATIVE LOOP: 반복형 신호 강화)
+## Chapter 4 (CLAIM CHAIN: 결론 도출 과정 검증)
 - What was analyzed:
-  - How much engineered features improve association compared to raw features.
+  - Claim-by-claim evidence chain to reduce logical leap from findings to conclusions.
 - Data used:
-  - `iterative_feature_correlation_v2.csv`
-  - `iterative_optimizer_summary_v2.json`
-  - `iterative_visualization_recommendations_v2.csv`
-  - `policy_priority_matrix_2024.csv` (for interaction scatter points)
+  - `claim_chain_*.csv`
+  - `claim_chain_*.json`
 - Processing:
-  - Iteration-wise best absolute Spearman extraction.
-  - Raw -> engineered/interactions loop progression tracking.
+  - Standardized table: claim -> data -> formula -> numeric result -> limitation.
+  - Explicit guardrails for non-causal interpretation and region-group level claims.
 - What result means:
-  - Improvement by iteration validates whether repeated feature engineering materially increases explanatory signal.
+  - Judges can audit exactly what each conclusion is based on and where interpretation must stop.
 - Site outputs:
-  - Loop progress chart + loop table + top-signal chart + interaction scatter + visualization recommendations.
-  - `outputs/site/chart_data/chapter5_iterative_feature_correlation.csv`
-  - `outputs/site/chart_data/chapter5_iterative_loop_progress.csv`
-  - `outputs/site/chart_data/chapter5_iterative_visualization_recommendations.csv`
+  - `outputs/site/chart_data/chapter4_claim_chain_table.csv`

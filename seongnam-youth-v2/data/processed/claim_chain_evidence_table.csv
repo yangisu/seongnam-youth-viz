@@ -1,0 +1,6 @@
+﻿claim_id,claim_text,metric_name,metric_value,formula,interpretation,limitation
+C1,노후·정체 권역의 총인구 1천명당 민원강도는 신축·재정비 대비 높다.,old_vs_new_complaint_intensity_ratio,2.0176805373631272,complaints_per_1000_totalpop_weighted(old_stagnant) / complaints_per_1000_totalpop_weighted(new_redevelopment),1보다 크면 노후·정체 권역 민원강도가 더 높다는 의미.,"축 분류는 행정동 묶음 기반이며, 민원은 청년 한정 지표가 아니다."
+C2,노후·정체 권역은 신축·재정비 대비 순유출 압력이 더 크다.,old_minus_new_weighted_outflow_rate_pctp,5.756193086524993,youth_outflow_rate_weighted(old_stagnant) - youth_outflow_rate_weighted(new_redevelopment),값이 클수록 노후·정체 쪽 순유출 압력이 상대적으로 큼.,"가중 순유출률은 집계 지표로, 개별 동의 이질성을 평균화한다."
+C3,신축 vs 노후의 민원 구성 차이에서 핵심 격차 주제는 상위 1개 토픽으로 설명 가능하다.,top_topic_share_gap_new_minus_old,-0.0275900668498042,max_abs(share_diff_new_minus_old) from policy_newold_topic_group_comparison_2024,절대값이 클수록 양 축의 민원 포트폴리오 차이가 큼. 현재 상위 주제: 시설노후/파손.,토픽 분류 규칙 기반이라 문장 맥락 손실 가능성이 있다.
+C4,월별 순유출 지속성(negative month share)과 연간 순유출률은 강한 양(+)의 연관을 보인다.,spearman_r_negative_month_share_vs_outflow_rate,0.9249227224217382,"Spearman r(negative_month_share, youth_outflow_rate)",1에 가까울수록 단조 증가 연관이 강함.,"상관은 인과를 보장하지 않으며 표본 수는 n=30, p=2.785e-13."
+C5,즉시개입(A) 권역 비율은 전체 정책 타겟 중 무시하기 어려운 규모다.,urgent_tier_share,0.1,count(policy_tier == 'A_즉시개입') / unique_cluster_count,값이 클수록 단기 개입 필요 권역 비중이 높음.,등급은 분위수 기반 규칙이며 임계값 선택에 민감할 수 있다.

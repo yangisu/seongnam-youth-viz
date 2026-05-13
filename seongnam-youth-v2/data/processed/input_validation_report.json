@@ -1,0 +1,27 @@
+{
+  "shared_paths": {
+    "data_by_region": "D:\\compe\\seongnam_dataanalysis\\seongnam-youth-viz\\data_by_region",
+    "data_by_type": "D:\\compe\\seongnam_dataanalysis\\seongnam-youth-viz\\data_by_type",
+    "shared_processed": "D:\\compe\\seongnam_dataanalysis\\seongnam-youth-viz\\data\\processed"
+  },
+  "region_file_count": 600,
+  "type_file_count": 13,
+  "region_month_count": 12,
+  "region_months": [
+    "202401",
+    "202402",
+    "202403",
+    "202404",
+    "202405",
+    "202406",
+    "202407",
+    "202408",
+    "202409",
+    "202410",
+    "202411",
+    "202412"
+  ],
+  "region_dong_count": 50,
+  "seed_missing_files": [],
+  "is_valid_for_v2": true
+}
