@@ -406,7 +406,7 @@ def write_traceability_doc() -> None:
   - `outputs/site/chart_data/chapter2_intra_cluster_matrix_top12.csv`
   - `outputs/site/chart_data/chapter2_intra_cluster_pairs.csv`
 
-## Chapter 3 (WHEN: 월별 민원-이동 연관)
+## Chapter 3 (VALIDATION: 월별 상관 보조 검증)
 - What was analyzed:
   - Whether complaint pressure co-moves with youth outflow over time.
 - Data used:
@@ -418,6 +418,7 @@ def write_traceability_doc() -> None:
   - Horizon windows (3/6/12 months) and association tests (Spearman/Pearson/OLS).
 - What result means:
   - Sign and strength of coefficients show whether complaint pressure and outflow pressure move together.
+  - In this project, the monthly association is not strong enough to serve as the main policy evidence, so it is treated as a validation-only layer.
 - Site outputs:
   - Monthly dual-axis trend + horizon scatter + association table.
   - `outputs/site/chart_data/chapter3_monthly_city.csv`
@@ -426,7 +427,7 @@ def write_traceability_doc() -> None:
   - `outputs/site/chart_data/chapter3_horizon_assoc.csv`
   - `outputs/site/chart_data/chapter3_horizon_points.csv`
 
-## Chapter 4 (EVIDENCE: 정책 우선순위 + 신축/노후 민원축)
+## Chapter 4 (MAIN EVIDENCE: 정책 우선순위 + 신축/노후 지역군)
 - What was analyzed:
   - Intervention tiers (A/B/C/D) and axis differences (`신축·재정비` vs `노후·정체`) in complaint/outflow patterns.
 - Data used:
@@ -441,9 +442,11 @@ def write_traceability_doc() -> None:
 - Processing:
   - High-outflow / persistent-outflow / high-complaint flags and weighted priority scoring.
   - Axis typing by cluster (`신축·재정비`, `노후·정체`, `혼합/전이`) and grouped complaint/outflow summaries.
+  - Topic-composition comparison between `신축·재정비` and `노후·정체` groups (share-difference view).
 - What result means:
   - Tiers identify urgency of intervention.
   - Axis comparison clarifies whether complaint burden and outflow pressure are concentrated by urban-structure type.
+  - `신축·재정비` / `노후·정체` are region-group labels (grouped administrative-dong clusters), not single dongs.
 - Site outputs:
   - Tier criteria, priority, risk charts + axis complaint visual and axis summary table.
   - `outputs/site/chart_data/chapter4_priority_matrix.csv`
@@ -516,7 +519,7 @@ th{color:#a1a1aa;font-weight:600}
 <header class=\"max-w-7xl mx-auto px-6 pt-10 pb-6\">
   <div class=\"section-num mb-3\">SEONGNAM YOUTH POLARIZATION · V2</div>
   <h1 class=\"text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-4\">어디서 빠지고,<br><span class=\"punchline\">어디서 다시 재배치되는가</span></h1>
-  <p class=\"text-lg text-zinc-400 max-w-4xl\">지도-이동-월별연관-정책근거를 분리해서, 각 단계의 데이터·지표·해석 기준을 명시했습니다.</p>
+  <p class=\"text-lg text-zinc-400 max-w-4xl\">핵심 흐름은 `공간(어디)` → `재배치 경로(어디로)` → `구조축(신축/노후 지역군)` → `정책우선순위`이며, 월별 상관은 보조 검증으로 분리했습니다.</p>
 </header>
 
 <section class=\"max-w-7xl mx-auto px-6 py-4\">
@@ -525,6 +528,10 @@ th{color:#a1a1aa;font-weight:600}
   <div class=\"card p-4 mb-8\">
     <div class=\"axis-note mb-3\">각 분석별로 무엇을 봤는지, 어떤 데이터를 썼는지, 어떻게 가공했는지, 결과가 정책적으로 무엇을 뜻하는지까지 한 줄로 연결합니다.</div>
     <table id=\"tbl-method-trace\"></table>
+  </div>
+  <div class=\"card p-4\">
+    <div class=\"text-sm text-zinc-300 mb-2\">이해 흐름 가이드</div>
+    <div class=\"axis-note\">CH1에서 순유출 hotspot을 식별하고, CH2에서 실제 내부 재배치 통로를 확인한 뒤, CH4에서 `신축·재정비 vs 노후·정체 지역군` 차이를 중심 근거로 제시합니다. CH3은 “민원강도-순유출률 상관”이 약함을 확인하는 보조 검증입니다.</div>
   </div>
 </section>
 
@@ -564,15 +571,22 @@ th{color:#a1a1aa;font-weight:600}
     </div>
     <div class=\"card p-4\">
       <div class=\"text-sm text-zinc-300 mb-2\">상위 생활권 이동쌍 TOP 20</div>
-      <div class=\"axis-note mb-2\">성남 내부에서 실제로 이동량이 큰 출발→도착 조합입니다.</div>
+      <div class=\"axis-note mb-2\">성남 내부에서 실제로 이동량이 큰 출발→도착 조합이며, 전체 내부이동 대비 비중(%)은 “어느 통로에 이동 압력이 몰리는지”를 보여줍니다.</div>
       <table id=\"tbl-pairs\"></table>
     </div>
+  </div>
+  <div class=\"card p-4 mt-6\">
+    <div class=\"text-sm text-zinc-300 mb-2\">왜 중요한가?</div>
+    <div id=\"chapter2-meaning\" class=\"axis-note\"></div>
   </div>
 </section>
 
 <section class=\"max-w-7xl mx-auto px-6 py-12\">
-  <div class=\"section-num mb-2\">CHAPTER 03 · WHEN</div>
-  <h2 class=\"text-3xl font-bold mb-2\">월별 이동 압력과 민원 신호 연관</h2>
+  <div class=\"section-num mb-2\">CHAPTER 03 · VALIDATION</div>
+  <h2 class=\"text-3xl font-bold mb-2\">월별 상관 보조 검증 (해석 제한 명시)</h2>
+  <div class=\"card p-4 mb-6\">
+    <div class=\"axis-note\">이 장은 “민원강도와 순유출률의 월별 동행”을 검증했지만, 상관이 충분히 강하지 않아 본 분석의 중심 근거로 사용하지 않습니다. 그래서 정책 해석의 중심은 CH4 구조축 비교로 이동합니다.</div>
+  </div>
   <div class=\"grid lg:grid-cols-2 gap-6\">
     <div class=\"card p-4\">
       <div class=\"text-sm text-zinc-300 mb-2\">월별 순이동(막대) vs 민원건수(선)</div>
@@ -593,8 +607,11 @@ th{color:#a1a1aa;font-weight:600}
 </section>
 
 <section class=\"max-w-7xl mx-auto px-6 py-12\">
-  <div class=\"section-num mb-2\">CHAPTER 04 · EVIDENCE</div>
-  <h2 class=\"text-3xl font-bold mb-2\">개입 등급 기준과 통계 근거</h2>
+  <div class=\"section-num mb-2\">CHAPTER 04 · MAIN EVIDENCE</div>
+  <h2 class=\"text-3xl font-bold mb-2\">신축/노후 지역군 중심 정책 근거</h2>
+  <div class=\"card p-4 mb-6\">
+    <div class=\"axis-note\">여기서 `신축·재정비`, `노후·정체`는 개별 행정동을 묶은 <b>지역군(생활권 클러스터)</b>입니다. 즉 “지역 분류”가 맞습니다.</div>
+  </div>
   <div class=\"grid lg:grid-cols-2 gap-6\">
     <div class=\"card p-4\">
       <div class=\"text-sm text-zinc-300 mb-2\">개입 등급(A/B/C/D) 기준</div>
@@ -617,16 +634,25 @@ th{color:#a1a1aa;font-weight:600}
       <div id=\"chart-tier-risk\" style=\"height:320px\"></div>
     </div>
   </div>
+  <div class=\"card p-4 mt-6\">
+    <div class=\"text-sm text-zinc-300 mb-2\">핵심 도표: 지역군(신축·재정비 vs 노후·정체)별 민원강도 분포</div>
+    <div class=\"axis-note mb-2\">X축은 지역군, Y축은 총인구 1천명당 민원강도입니다. 이 도표를 본 분석의 중심 근거로 사용합니다.</div>
+    <div id=\"chart-axis-complaint\" style=\"height:460px\"></div>
+  </div>
   <div class=\"grid lg:grid-cols-2 gap-6 mt-6\">
     <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">신축 vs 노후 × 민원강도 분포</div>
-      <div class=\"axis-note mb-2\">그룹: `신축·재정비` / `노후·정체` / `혼합·전이`. 값이 높을수록 총인구 1천명당 민원강도가 높습니다.</div>
-      <div id=\"chart-axis-complaint\" style=\"height:320px\"></div>
-    </div>
-    <div class=\"card p-4\">
-      <div class=\"text-sm text-zinc-300 mb-2\">신축 vs 노후 × 민원/유출 요약 테이블</div>
+      <div class=\"text-sm text-zinc-300 mb-2\">지역군 요약 (민원/유출/A·B 비중)</div>
       <table id=\"tbl-axis-findings\"></table>
     </div>
+    <div class=\"card p-4\">
+      <div class=\"text-sm text-zinc-300 mb-2\">지역군 구성 행정동</div>
+      <table id=\"tbl-axis-regions\"></table>
+    </div>
+  </div>
+  <div class=\"card p-4 mt-6\">
+    <div class=\"text-sm text-zinc-300 mb-2\">대체 관점: 지역군별 민원 토픽 구성 차이</div>
+    <div class=\"axis-note mb-2\">상관이 약할 때는 “수준(level)”보다 “구성(composition)” 차이를 본다는 관점입니다. 값(신축비중-노후비중)이 +면 신축·재정비에서 상대적으로 더 비중이 큽니다.</div>
+    <div id=\"chart-axis-topic-diff\" style=\"height:340px\"></div>
   </div>
   <div class=\"card p-4 mt-6\">
     <div class=\"text-sm text-zinc-300 mb-2\">신축/노후 축 정의 근거 (첨부 파일 반영)</div>
@@ -706,8 +732,8 @@ const byRate = [...(D.dong||[])].sort((a,b)=>a['청년_순유출률']-b['청년_
 const methodTrace = [
   ['CH1 WHAT', '동별 청년 순유출 hotspot 식별', 'youth_migration + youth_population + geojson', '(전출-전입)/청년인구*100 + 폴리곤 결합', '순유출 고위험 동을 1차 선별'],
   ['CH2 WHERE', '성남 내부 재배치 경로 식별', 'od_youth_intra_seongnam_dong', '동 OD -> 생활권 행렬 + 상위 경로 추출', '내부 이동 집중 통로 파악'],
-  ['CH3 WHEN', '민원 압력-순유출 동행 여부', 'monthly OD + monthly complaints', '월집계 + 3/6/12개월 창 연관검정', '연관 강도/방향 확인'],
-  ['CH4 EVIDENCE', '개입등급 + 신축/노후 민원축 비교', 'priority + policy_newold_axis/group/topic', '플래그 규칙/점수화 + 축 그룹 집계', '정책 우선순위와 구조축 차이 해석'],
+  ['CH3 VALIDATION', '월별 상관 보조 검증', 'monthly OD + monthly complaints', '월집계 + 3/6/12개월 창 연관검정', '약한 상관 확인 후 중심 해석 축 전환'],
+  ['CH4 MAIN EVIDENCE', '개입등급 + 신축/노후 지역군 비교', 'priority + policy_newold_axis/group/topic', '플래그 규칙/점수화 + 축 그룹 집계 + 토픽구성 비교', '정책 우선순위와 지역군별 구조 차이 해석'],
   ['CH5 ITERATIVE', '반복형 피처엔지니어링 효과', 'iterative correlations/recommendations', 'iteration별 최고 신호 추적 + 상호작용 분해', '재평가 루프로 신호 강화 확인'],
 ];
 document.getElementById('tbl-method-trace').innerHTML = tableHtml(
@@ -778,10 +804,22 @@ Plotly.newPlot('heat-intra', [{
 },{displayModeBar:false});
 
 const pairs = (D.od_intra_pairs||[]).slice(0,20);
+const totalIntra = (D.od_intra||[]).reduce((acc,row)=>acc + Number(row.n||0), 0);
 document.getElementById('tbl-pairs').innerHTML = tableHtml(
-  ['순위','출발','도착','이동(명)'],
-  pairs.map((r,i)=>[i+1, r.origin_cluster, r.dest_cluster, fmt(r.n)])
+  ['순위','출발','도착','이동(명)','내부이동 비중(%)'],
+  pairs.map((r,i)=>[
+    i+1,
+    r.origin_cluster,
+    r.dest_cluster,
+    fmt(r.n),
+    totalIntra>0 ? n2(Number(r.n)/totalIntra*100) : '—'
+  ])
 );
+const top3Pairs = pairs.slice(0,3).map(r=>`${r.origin_cluster}→${r.dest_cluster}`).join(', ');
+document.getElementById('chapter2-meaning').innerHTML =
+  top3Pairs
+    ? `상위 이동쌍은 단순 순위가 아니라, 청년 재배치가 실제로 집중되는 “핵심 이동 통로”입니다. TOP3(<b>${top3Pairs}</b>)는 개입 우선 생활권과 연결해 원인-결과 경로를 설명하는 근거가 됩니다.`
+    : '현재 월의 유의미한 상위 이동쌍이 충분하지 않습니다.';
 
 // CH3 monthly
 const city = (D.monthly_city||[]).slice().sort((a,b)=>String(a.month).localeCompare(String(b.month)));
@@ -843,7 +881,7 @@ function hText(row){
   return `${level} (r=${n2(row.spearman_r)}, p=${n2(row.spearman_p)}, n=${fmt(row.n)})`;
 }
 document.getElementById('lag-summary').innerHTML =
-  `<b>핵심 해석:</b> 3개월=${hText(h3)} / 6개월=${hText(h6)} / 12개월=${hText(h12)}.`;
+  `<b>핵심 해석:</b> 3개월=${hText(h3)} / 6개월=${hText(h6)} / 12개월=${hText(h12)}.<br>결론적으로 월별 동행은 보조적 신호이며, 본 분석의 주근거는 CH4의 지역군(신축·재정비/노후·정체) 구조 비교입니다.`;
 
 const assoc = (D.horizon_assoc||[]).map(r=>[
   `${fmt(r.horizon_months)}개월`,
@@ -944,7 +982,7 @@ if (axisChartTraces.length){
     font:{family:'Pretendard',color:'#f4f4f8',size:10},
     xaxis:{gridcolor:'#252837'},
     yaxis:{title:'민원강도(총인구 1천명당)',gridcolor:'#252837'},
-    margin:{l:60,r:10,t:10,b:40},
+    margin:{l:60,r:10,t:10,b:70},
     showlegend:false
   }, {displayModeBar:false});
 }
@@ -958,6 +996,38 @@ document.getElementById('tbl-axis-findings').innerHTML = tableHtml(
     n2(r.ab_tier_share_pct)
   ])
 );
+document.getElementById('tbl-axis-regions').innerHTML = tableHtml(
+  ['지역군', '포함 생활권(행정동 클러스터)'],
+  axisOrder.map(label => {
+    const members = [...new Set(axisRows.filter(r=>String(r.axis_type)===label).map(r=>String(r.dong_cluster||'')))]
+      .filter(Boolean)
+      .sort((a,b)=>a.localeCompare(b,'ko'));
+    return [label, members.length ? members.join(', ') : '—'];
+  })
+);
+
+const topicComp = (D.policy_newold_topic_comp || []).slice();
+const topicDiff = topicComp
+  .filter(r=>Number.isFinite(Number(r.share_diff_new_minus_old)))
+  .sort((a,b)=>Math.abs(Number(b.share_diff_new_minus_old))-Math.abs(Number(a.share_diff_new_minus_old)))
+  .slice(0,8);
+if (topicDiff.length){
+  Plotly.newPlot('chart-axis-topic-diff', [{
+    type:'bar',
+    orientation:'h',
+    y:topicDiff.map(r=>String(r.topic_group)),
+    x:topicDiff.map(r=>Number(r.share_diff_new_minus_old)*100),
+    marker:{color:topicDiff.map(r=>Number(r.share_diff_new_minus_old)>=0 ? '#38bdf8' : '#f97316')},
+    customdata:topicDiff.map(r=>[r.new_redevelopment_topic_share, r.old_stagnant_topic_share]),
+    hovertemplate:'%{y}<br>신축-노후 비중차: %{x:.2f}%p<br>신축비중: %{customdata[0]:.3f}<br>노후비중: %{customdata[1]:.3f}<extra></extra>'
+  }],{
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+    font:{family:'Pretendard',color:'#f4f4f8',size:10},
+    xaxis:{title:'비중차 (신축·재정비 - 노후·정체, %p)',gridcolor:'#252837'},
+    yaxis:{autorange:'reversed',gridcolor:'#252837'},
+    margin:{l:110,r:20,t:10,b:50}
+  },{displayModeBar:false});
+}
 const axisContext = D.axis_context_evidence || [];
 document.getElementById('tbl-axis-context').innerHTML = tableHtml(
   ['출처', '근거 라벨', '근거 문구', '분석 매핑 축'],
@@ -973,6 +1043,7 @@ const topA = allPri.filter(r=>r.policy_tier==='A_즉시개입').slice(0,5).map(r
 const strongest = (D.policy_relations||[])[0];
 document.getElementById('chapter4-conclusion').innerHTML = [
   `개입 등급 분포는 <b>A ${tierCounts[0]}개, B ${tierCounts[1]}개, C ${tierCounts[2]}개, D ${tierCounts[3]}개</b>입니다.`,
+  `신축·재정비/노후·정체는 개별 동이 아니라, 동을 묶은 <b>지역군 분류</b>입니다.`,
   axisSummary.length ? `축 비교에서 민원강도 평균이 가장 높은 그룹은 <b>${axisSummary.slice().sort((a,b)=>Number(b.mean_complaints_per_1000)-Number(a.mean_complaints_per_1000))[0].axis_type}</b>입니다.` : '',
   topA.length ? `즉시개입(A) 우선 생활권은 <b>${topA.join(', ')}</b>입니다.` : '즉시개입(A) 생활권은 없습니다.',
   strongest ? `정책지표 중 유출률과 가장 강한 연관은 <b>${strongest.x_variable}</b> (Spearman r=${n2(strongest.spearman_r)}, p=${n2(strongest.spearman_p)})입니다.` : ''

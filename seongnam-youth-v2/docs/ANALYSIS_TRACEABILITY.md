@@ -31,7 +31,7 @@
   - `outputs/site/chart_data/chapter2_intra_cluster_matrix_top12.csv`
   - `outputs/site/chart_data/chapter2_intra_cluster_pairs.csv`
 
-## Chapter 3 (WHEN: 월별 민원-이동 연관)
+## Chapter 3 (VALIDATION: 월별 상관 보조 검증)
 - What was analyzed:
   - Whether complaint pressure co-moves with youth outflow over time.
 - Data used:
@@ -43,6 +43,7 @@
   - Horizon windows (3/6/12 months) and association tests (Spearman/Pearson/OLS).
 - What result means:
   - Sign and strength of coefficients show whether complaint pressure and outflow pressure move together.
+  - In this project, the monthly association is not strong enough to serve as the main policy evidence, so it is treated as a validation-only layer.
 - Site outputs:
   - Monthly dual-axis trend + horizon scatter + association table.
   - `outputs/site/chart_data/chapter3_monthly_city.csv`
@@ -51,7 +52,7 @@
   - `outputs/site/chart_data/chapter3_horizon_assoc.csv`
   - `outputs/site/chart_data/chapter3_horizon_points.csv`
 
-## Chapter 4 (EVIDENCE: 정책 우선순위 + 신축/노후 민원축)
+## Chapter 4 (MAIN EVIDENCE: 정책 우선순위 + 신축/노후 지역군)
 - What was analyzed:
   - Intervention tiers (A/B/C/D) and axis differences (`신축·재정비` vs `노후·정체`) in complaint/outflow patterns.
 - Data used:
@@ -66,9 +67,11 @@
 - Processing:
   - High-outflow / persistent-outflow / high-complaint flags and weighted priority scoring.
   - Axis typing by cluster (`신축·재정비`, `노후·정체`, `혼합/전이`) and grouped complaint/outflow summaries.
+  - Topic-composition comparison between `신축·재정비` and `노후·정체` groups (share-difference view).
 - What result means:
   - Tiers identify urgency of intervention.
   - Axis comparison clarifies whether complaint burden and outflow pressure are concentrated by urban-structure type.
+  - `신축·재정비` / `노후·정체` are region-group labels (grouped administrative-dong clusters), not single dongs.
 - Site outputs:
   - Tier criteria, priority, risk charts + axis complaint visual and axis summary table.
   - `outputs/site/chart_data/chapter4_priority_matrix.csv`
