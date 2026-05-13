@@ -11,57 +11,44 @@
 3. **WHY** — 동×민원 키워드 히트맵 + 비교 워드클라우드 + 분야별 시계열
 4. **CONSEQUENCE** — 청년 유출 ↔ 벤처기업/가맹점 분포
 
-## 디렉토리
+## 디렉토리 및 구조 (V2)
+
+기존 분석 스크립트와 로직은 모두 새롭게 개편된 `seongnam-youth-v2/` 디렉토리 하위로 통합되었습니다. 기존 원본 데이터는 루트 디렉토리에 유지되며, V2 파이프라인에서 이를 참조하여 분석을 수행합니다.
 
 ```
 seongnam-youth-viz/
-├── data/
-│   ├── raw/
-│   │   ├── mois_population/      # 행안부 행정동 성·연령 인구 (CSV)
-│   │   ├── mois_migration/       # 행안부 인구이동 (CSV)
-│   │   ├── seongnam_dong/        # 성남시 동별 인구·세대 (보조)
-│   │   ├── seongnam_complaint/   # data.seongnam.go.kr 동별 키워드
-│   │   ├── epeople/              # 국민신문고 청년 민원 시계열
-│   │   ├── venture/              # 성남시 벤처기업
-│   │   ├── vendor/               # 가맹점·통신판매업
-│   │   └── DOWNLOAD_URLS.md      # ★ 데이터 받는 법
-│   ├── processed/                # 정제본 (자동 생성)
-│   └── geojson/                  # 성남시 행정동 경계 (자동 확보 완료)
-├── src/                          # 분석 스크립트 (01~06)
-├── outputs/{figures,interactive,dashboard}/
-└── docs/
+├── data_by_region/               # 동별/월별 민원 상세 원본 데이터 (Excel)
+├── data_by_type/                 # 유형별 민원 상세 원본 데이터 (Excel)
+├── seongnam-youth-v2/            # ★ 메인 분석 파이프라인 (V2)
+│   ├── src/                      # 데이터 처리, 통계 분석, 시각화 Python 스크립트 (00~10)
+│   ├── data/
+│   │   ├── processed/            # V2 파이프라인이 생성한 분석 결과 및 정제된 데이터
+│   │   └── geojson/              # 성남시 행정동 경계 지도 파일
+│   ├── outputs/                  # 생성된 인터랙티브 차트 및 HTML 웹 사이트 결과물
+│   ├── docs/                     # 자동 생성되는 마크다운 리포트 및 문서
+│   ├── run_all.ps1               # 전체 파이프라인 순차 실행 스크립트
+│   └── README.md                 # V2 상세 안내 문서
+└── README.md                     # 현재 문서
 ```
 
 ## 실행 방법
 
-```bash
-# 1. 가상환경
+분석 및 시각화 전체 파이프라인은 `seongnam-youth-v2/` 폴더 내의 스크립트를 통해 일괄 실행할 수 있습니다. `run_all.ps1`은 데이터 검증부터 통계 분석, 최적화, 최종 HTML 웹 페이지 생성까지 전 과정을 자동화합니다.
+
+```powershell
+# 1. 작업 디렉토리 이동
+cd seongnam-youth-v2
+
+# 2. 가상환경 설정 및 패키지 설치
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+. .venv/Scripts/Activate.ps1
 pip install -r requirements.txt
 
-# 2. 데이터 다운로드 → data/raw/DOWNLOAD_URLS.md 안내대로 raw/* 채우기
-
-# 3. 정제·분석·시각화
-python src/01_load_population.py    # 청년 순유출률
-python src/02_load_od.py            # OD 흐름
-python src/03_load_complaint.py     # 민원 키워드·시계열
-python src/04_load_economy.py       # 벤처·가맹점
-python src/05_analysis.py           # 파생 지표
-python src/06_visualizations.py     # Folium/Plotly 산출물
-
-# 4. 대시보드 (옵션)
-streamlit run outputs/dashboard/app.py
-
-# 5. Iterative Optimization (CTO workflow)
-# - Re-plan automatically when correlations are weak
-# - Optional auto-download if AUTO_DOWNLOAD_MANIFEST.csv exists
-python src/08_iterative_optimizer.py --threshold 0.30 --max-iterations 4
-python src/08_iterative_optimizer.py --auto-download --threshold 0.30 --max-iterations 4
+# 3. 전체 파이프라인 자동 실행 (00 ~ 10 단계 전체 실행)
+./run_all.ps1
 ```
 
-Copy `docs/AUTO_DOWNLOAD_MANIFEST.example.csv` to
-`data/raw/AUTO_DOWNLOAD_MANIFEST.csv` and fill source URLs for auto-download.
+> **참고**: `src/08_iterative_optimizer.py`를 단독 실행하여 추가적인 가중치 최적화 및 모델 평가를 반복 수행할 수 있습니다.
 ## 데이터 출처 (모두 data.go.kr 또는 GitHub 공개)
 
 | 코드 | 출처 | 용도 |
